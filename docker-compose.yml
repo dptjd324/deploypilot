@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: deploypilot-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: deploypilot
+      POSTGRES_USER: deploypilot
+      POSTGRES_PASSWORD: deploypilot
+    volumes:
+      - deploypilot_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  deploypilot_postgres_data:

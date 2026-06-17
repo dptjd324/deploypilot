@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/deploypilot
+    username: deploypilot
+    password: deploypilot
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+deploypilot:
+  webhook:
+    secret: local-secret
