@@ -62,6 +62,38 @@ POST /api/releases/{releaseId}/approve
 POST /api/releases/{releaseId}/deploy
 POST /api/releases/{releaseId}/rollback
 
+Create Request
+{
+  "serviceAppId": 1,
+  "version": "v1.0.0",
+  "environment": "PRODUCTION",
+  "branch": "main",
+  "commitHash": "abc123",
+  "commitTime": "2026-06-19T10:00:00"
+}
+
+Response
+{
+  "id": 1,
+  "serviceAppId": 1,
+  "serviceName": "order-api",
+  "version": "v1.0.0",
+  "environment": "PRODUCTION",
+  "branch": "main",
+  "commitHash": "abc123",
+  "commitTime": "2026-06-19T10:00:00",
+  "status": "CREATED",
+  "gateStatus": "PENDING",
+  "createdAt": "2026-06-19T10:01:00",
+  "ciStartedAt": null,
+  "ciFinishedAt": null,
+  "deployedAt": null,
+  "monitoringStartedAt": null,
+  "stableAt": null,
+  "failedAt": null,
+  "rolledBackAt": null
+}
+
 GitHub Actions Integration
 POST /api/integrations/github-actions/runs
 
@@ -76,6 +108,7 @@ Request Example
   "branch": "main",
   "commitHash": "a8f3d91",
   "workflowName": "CI",
+  "runId": "123",
   "status": "SUCCESS",
   "totalTests": 120,
   "passedTests": 120,
@@ -84,6 +117,25 @@ Request Example
   "logUrl": "https://github.com/example/order-api/actions/runs/123",
   "startedAt": "2026-06-16T10:00:00",
   "finishedAt": "2026-06-16T10:03:30"
+}
+
+Response Example
+{
+  "id": 1,
+  "releaseId": 1,
+  "provider": "GITHUB_ACTIONS",
+  "workflowName": "CI",
+  "runId": "123",
+  "status": "SUCCESS",
+  "totalTests": 120,
+  "passedTests": 120,
+  "failedTests": 0,
+  "coverage": 78.40,
+  "startedAt": "2026-06-16T10:00:00",
+  "finishedAt": "2026-06-16T10:03:30",
+  "durationSeconds": 210,
+  "logUrl": "https://github.com/example/order-api/actions/runs/123",
+  "createdAt": "2026-06-16T10:03:31"
 }
 
 

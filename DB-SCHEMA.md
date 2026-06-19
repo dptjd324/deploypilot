@@ -57,6 +57,25 @@ Status values:
 - failed_at
 - rolled_back_at
 
+Release status values:
+
+- CREATED
+- CI_RUNNING
+- CI_SUCCESS
+- CI_FAILED
+- APPROVED
+- DEPLOYED
+- STABLE
+- FAILED
+- ROLLED_BACK
+
+Gate status values:
+
+- PENDING
+- PASS
+- WARN
+- FAIL
+
 ### ci_run
 
 - id
@@ -74,6 +93,17 @@ Status values:
 - duration_seconds
 - log_url
 - created_at
+
+Provider values:
+
+- GITHUB_ACTIONS
+
+Status values:
+
+- IN_PROGRESS
+- SUCCESS
+- FAILURE
+- CANCELLED
 
 ### quality_check_result
 

@@ -17,21 +17,21 @@
 
 ## Phase 4 - Release Management
 
-- [ ] Add Release entity
-- [ ] Add ReleaseStatus enum
-- [ ] Add GateStatus enum
-- [ ] Add release creation API
-- [ ] Add release detail API
-- [ ] Add release status transition logic
+- [x] Add Release entity
+- [x] Add ReleaseStatus enum
+- [x] Add GateStatus enum
+- [x] Add release creation API
+- [x] Add release detail API
+- [x] Add release status transition logic
 
 ## Phase 5 - GitHub Actions Integration
 
-- [ ] Add CiRun entity
-- [ ] Add CI provider enum
-- [ ] Add GitHub Actions webhook API
-- [ ] Add webhook secret validation
-- [ ] Save CI result
-- [ ] Update release status from CI result
+- [x] Add CiRun entity
+- [x] Add CI provider enum
+- [x] Add GitHub Actions webhook API
+- [x] Add webhook secret validation
+- [x] Save CI result
+- [x] Update release status from CI result
 
 ## Phase 6 - Quality Gate Model
 
