@@ -35,12 +35,12 @@
 
 ## Phase 6 - Quality Gate Model
 
-- [ ] Add QualityCheckResult entity
-- [ ] Add QualityGateResult entity
-- [ ] Add CheckType enum
-- [ ] Add CheckStatus enum
-- [ ] Add Severity enum
-- [ ] Add GateResult enum
+- [x] Add QualityCheckResult entity
+- [x] Add QualityGateResult entity
+- [x] Add CheckType enum
+- [x] Add CheckStatus enum
+- [x] Add Severity enum
+- [x] Add GateResult enum
 
 ## Phase 7 - Quality Gate Engine
 

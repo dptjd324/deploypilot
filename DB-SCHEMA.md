@@ -116,6 +116,31 @@ Status values:
 - detail_json
 - checked_at
 
+Check type values:
+
+- BUILD
+- TEST
+- COVERAGE
+- CHECKLIST
+- HEALTH_CHECK
+- SMOKE_TEST
+- DB_MIGRATION_RISK
+- SECURITY_CONFIG_RISK
+- METRIC_ERROR_RATE
+- METRIC_RESPONSE_TIME
+
+Check status values:
+
+- PASS
+- WARN
+- FAIL
+
+Severity values:
+
+- INFO
+- WARNING
+- BLOCKER
+
 ### quality_gate_result
 
 - id
@@ -123,6 +148,12 @@ Status values:
 - result
 - reason
 - checked_at
+
+Gate result values:
+
+- PASS
+- WARN
+- FAIL
 
 ### checklist_item
 

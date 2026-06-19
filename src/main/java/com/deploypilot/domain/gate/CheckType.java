@@ -1,0 +1,14 @@
+package com.deploypilot.domain.gate;
+
+public enum CheckType {
+	BUILD,
+	TEST,
+	COVERAGE,
+	CHECKLIST,
+	HEALTH_CHECK,
+	SMOKE_TEST,
+	DB_MIGRATION_RISK,
+	SECURITY_CONFIG_RISK,
+	METRIC_ERROR_RATE,
+	METRIC_RESPONSE_TIME
+}
