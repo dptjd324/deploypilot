@@ -2,6 +2,7 @@ package com.deploypilot.domain.release;
 
 import com.deploypilot.domain.serviceapp.ServiceApp;
 import com.deploypilot.domain.serviceapp.ServiceAppEnvironment;
+import com.deploypilot.domain.gate.GateResult;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -145,6 +146,10 @@ public class Release {
 
 		this.status = ReleaseStatus.CI_FAILED;
 		this.failedAt = finishedAt != null ? finishedAt : LocalDateTime.now();
+	}
+
+	public void applyGateResult(GateResult result) {
+		this.gateStatus = GateStatus.valueOf(result.name());
 	}
 
 	private void requireStatus(ReleaseStatus requiredStatus) {
