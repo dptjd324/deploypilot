@@ -240,6 +240,23 @@ Health check status values:
 - target_text
 - checked_at
 
+Risk type values:
+
+- DB_MIGRATION
+- SECURITY_CONFIG
+
+Risk check status values:
+
+- PASS
+- WARN
+- FAIL
+
+Risk severity values:
+
+- INFO
+- WARNING
+- BLOCKER
+
 ### release_metric
 
 - id

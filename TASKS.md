@@ -65,9 +65,9 @@
 
 ## Phase 9 - Risk Check
 
-- [ ] Add RiskCheckResult
-- [ ] Add DB Migration Risk Check
-- [ ] Add Security Config Risk Check
+- [x] Add RiskCheckResult
+- [x] Add DB Migration Risk Check
+- [x] Add Security Config Risk Check
 
 ## Phase 10 - Post Deploy Metrics
 

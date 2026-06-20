@@ -215,6 +215,24 @@ POST /api/releases/{releaseId}/risk-check/db-migration
 POST /api/releases/{releaseId}/risk-check/security-config
 GET /api/releases/{releaseId}/risk-checks
 
+Request
+{
+  "targetText": "ALTER TABLE orders DROP COLUMN legacy_code;"
+}
+
+Response
+{
+  "id": 1,
+  "releaseId": 1,
+  "riskType": "DB_MIGRATION",
+  "severity": "BLOCKER",
+  "status": "FAIL",
+  "message": "DB migration contains destructive operation",
+  "detectedPattern": "DROP COLUMN",
+  "targetText": "ALTER TABLE orders DROP COLUMN legacy_code;",
+  "checkedAt": "2026-06-20T10:00:00"
+}
+
 
 Metrics
 POST /api/releases/{releaseId}/metrics
