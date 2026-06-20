@@ -167,6 +167,12 @@ Gate result values:
 - checked_by
 - checked_at
 
+Checklist phase values:
+
+- PRE_DEPLOY
+- DEPLOY
+- POST_DEPLOY
+
 ### smoke_test
 
 - id
@@ -181,6 +187,14 @@ Gate result values:
 - created_at
 - updated_at
 
+Smoke test method values:
+
+- GET
+- POST
+- PUT
+- PATCH
+- DELETE
+
 ### smoke_test_result
 
 - id
@@ -191,6 +205,11 @@ Gate result values:
 - response_time_ms
 - error_message
 - executed_at
+
+Smoke test result status values:
+
+- PASS
+- FAIL
 
 ### health_check_result
 
@@ -203,6 +222,11 @@ Gate result values:
 - response_body
 - error_message
 - checked_at
+
+Health check status values:
+
+- PASS
+- FAIL
 
 ### risk_check_result
 

@@ -149,6 +149,19 @@ Health Check
 POST /api/releases/{releaseId}/health-check/run
 GET /api/releases/{releaseId}/health-checks
 
+Response Example
+{
+  "id": 1,
+  "releaseId": 1,
+  "serviceAppId": 1,
+  "status": "PASS",
+  "httpStatus": 200,
+  "responseTimeMs": 120,
+  "responseBody": "ok",
+  "errorMessage": null,
+  "checkedAt": "2026-06-20T10:00:00"
+}
+
 
 Smoke Test
 GET /api/services/{serviceId}/smoke-tests
@@ -156,6 +169,45 @@ POST /api/services/{serviceId}/smoke-tests
 PUT /api/services/{serviceId}/smoke-tests/{smokeTestId}
 POST /api/releases/{releaseId}/smoke-tests/run
 GET /api/releases/{releaseId}/smoke-test-results
+
+Create or Update Request
+{
+  "name": "Root endpoint",
+  "method": "GET",
+  "path": "/",
+  "expectedStatus": 200,
+  "maxResponseTimeMs": 500,
+  "required": true,
+  "enabled": true
+}
+
+Smoke Test Response
+{
+  "id": 1,
+  "serviceAppId": 1,
+  "name": "Root endpoint",
+  "method": "GET",
+  "path": "/",
+  "expectedStatus": 200,
+  "maxResponseTimeMs": 500,
+  "required": true,
+  "enabled": true,
+  "createdAt": "2026-06-20T10:00:00",
+  "updatedAt": "2026-06-20T10:00:00"
+}
+
+Smoke Test Result Response
+{
+  "id": 1,
+  "releaseId": 1,
+  "smokeTestId": 1,
+  "smokeTestName": "Root endpoint",
+  "status": "PASS",
+  "actualStatus": 200,
+  "responseTimeMs": 100,
+  "errorMessage": null,
+  "executedAt": "2026-06-20T10:01:00"
+}
 
 
 Risk Check
