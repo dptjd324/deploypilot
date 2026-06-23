@@ -287,5 +287,6 @@ DORA Dashboard Response
 {
   "from": "2026-06-01T00:00:00",
   "to": "2026-06-30T23:59:59",
-  "deploymentFrequency": 12
+  "deploymentFrequency": 12,
+  "averageLeadTimeMinutes": 135
 }

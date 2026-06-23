@@ -1,6 +1,7 @@
 package com.deploypilot.domain.release;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,6 @@ public interface ReleaseRepository extends JpaRepository<Release, Long> {
 	);
 
 	long countByDeployedAtBetween(LocalDateTime from, LocalDateTime to);
+
+	List<Release> findByDeployedAtBetweenAndCommitTimeIsNotNull(LocalDateTime from, LocalDateTime to);
 }
