@@ -85,7 +85,7 @@
 
 ## Phase 12 - DORA Dashboard
 
-- [ ] Add deployment frequency calculation
+- [x] Add deployment frequency calculation
 - [ ] Add lead time for changes calculation
 - [ ] Add change failure rate calculation
 - [ ] Add failed deployment recovery time calculation

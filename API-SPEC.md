@@ -259,7 +259,7 @@ Response
 Metrics
 POST /api/releases/{releaseId}/metrics
 GET /api/releases/{releaseId}/metrics
-GET /api/dashboard/dora
+GET /api/dashboard/dora?from=2026-06-01T00:00:00&to=2026-06-30T23:59:59
 GET /api/dashboard/releases
 GET /api/dashboard/services/{serviceId}
 
@@ -281,4 +281,11 @@ Response
   "avgResponseTimeMs": 120,
   "p95ResponseTimeMs": 450,
   "collectedAt": "2026-06-23T10:00:00"
+}
+
+DORA Dashboard Response
+{
+  "from": "2026-06-01T00:00:00",
+  "to": "2026-06-30T23:59:59",
+  "deploymentFrequency": 12
 }
