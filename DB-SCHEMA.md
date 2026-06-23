@@ -268,6 +268,13 @@ Risk severity values:
 - p95_response_time_ms
 - collected_at
 
+Metric evaluation rule:
+
+- Error rate >= 5.00 is BLOCKER FAIL
+- Error rate >= 1.00 and < 5.00 is WARNING WARN
+- P95 response time >= 3000ms is BLOCKER FAIL
+- P95 response time >= 1000ms and < 3000ms is WARNING WARN
+
 ### rollback_record
 
 - id

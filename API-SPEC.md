@@ -236,6 +236,27 @@ Response
 
 Metrics
 POST /api/releases/{releaseId}/metrics
+GET /api/releases/{releaseId}/metrics
 GET /api/dashboard/dora
 GET /api/dashboard/releases
 GET /api/dashboard/services/{serviceId}
+
+Request
+{
+  "totalRequests": 1000,
+  "error5xxCount": 10,
+  "avgResponseTimeMs": 120,
+  "p95ResponseTimeMs": 450
+}
+
+Response
+{
+  "id": 1,
+  "releaseId": 1,
+  "totalRequests": 1000,
+  "error5xxCount": 10,
+  "errorRate": 1.00,
+  "avgResponseTimeMs": 120,
+  "p95ResponseTimeMs": 450,
+  "collectedAt": "2026-06-23T10:00:00"
+}

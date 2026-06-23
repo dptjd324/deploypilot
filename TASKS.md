@@ -71,10 +71,10 @@
 
 ## Phase 10 - Post Deploy Metrics
 
-- [ ] Add ReleaseMetric
-- [ ] Add metrics collection API
-- [ ] Evaluate error rate
-- [ ] Evaluate response time
+- [x] Add ReleaseMetric
+- [x] Add metrics collection API
+- [x] Evaluate error rate
+- [x] Evaluate response time
 
 ## Phase 11 - Rollback
 
