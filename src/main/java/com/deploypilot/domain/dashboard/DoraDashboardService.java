@@ -3,6 +3,9 @@ package com.deploypilot.domain.dashboard;
 import com.deploypilot.domain.dashboard.dto.DoraDashboardResponse;
 import com.deploypilot.domain.release.Release;
 import com.deploypilot.domain.release.ReleaseRepository;
+import com.deploypilot.domain.release.ReleaseStatus;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +31,8 @@ public class DoraDashboardService {
 
 		long deploymentFrequency = releaseRepository.countByDeployedAtBetween(from, to);
 		long averageLeadTimeMinutes = calculateAverageLeadTimeMinutes(from, to);
-		return new DoraDashboardResponse(from, to, deploymentFrequency, averageLeadTimeMinutes);
+		BigDecimal changeFailureRate = calculateChangeFailureRate(from, to, deploymentFrequency);
+		return new DoraDashboardResponse(from, to, deploymentFrequency, averageLeadTimeMinutes, changeFailureRate);
 	}
 
 	private long calculateAverageLeadTimeMinutes(LocalDateTime from, LocalDateTime to) {
@@ -41,5 +45,21 @@ public class DoraDashboardService {
 				.mapToLong(release -> Duration.between(release.getCommitTime(), release.getDeployedAt()).toMinutes())
 				.average()
 				.orElse(0));
+	}
+
+	private BigDecimal calculateChangeFailureRate(LocalDateTime from, LocalDateTime to, long deploymentFrequency) {
+		if (deploymentFrequency == 0) {
+			return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+		}
+
+		long failedDeployments = releaseRepository.countByDeployedAtBetweenAndStatusIn(
+				from,
+				to,
+				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
+		);
+
+		return BigDecimal.valueOf(failedDeployments)
+				.multiply(BigDecimal.valueOf(100))
+				.divide(BigDecimal.valueOf(deploymentFrequency), 2, RoundingMode.HALF_UP);
 	}
 }

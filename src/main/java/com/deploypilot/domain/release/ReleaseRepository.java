@@ -16,5 +16,7 @@ public interface ReleaseRepository extends JpaRepository<Release, Long> {
 
 	long countByDeployedAtBetween(LocalDateTime from, LocalDateTime to);
 
+	long countByDeployedAtBetweenAndStatusIn(LocalDateTime from, LocalDateTime to, List<ReleaseStatus> statuses);
+
 	List<Release> findByDeployedAtBetweenAndCommitTimeIsNotNull(LocalDateTime from, LocalDateTime to);
 }

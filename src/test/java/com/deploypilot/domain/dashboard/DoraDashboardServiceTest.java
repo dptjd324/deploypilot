@@ -9,8 +9,10 @@ import static org.mockito.Mockito.when;
 import com.deploypilot.domain.dashboard.dto.DoraDashboardResponse;
 import com.deploypilot.domain.release.Release;
 import com.deploypilot.domain.release.ReleaseRepository;
+import com.deploypilot.domain.release.ReleaseStatus;
 import com.deploypilot.domain.serviceapp.ServiceApp;
 import com.deploypilot.domain.serviceapp.ServiceAppEnvironment;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,11 @@ class DoraDashboardServiceTest {
 
 		when(releaseRepository.countByDeployedAtBetween(from, to)).thenReturn(12L);
 		when(releaseRepository.findByDeployedAtBetweenAndCommitTimeIsNotNull(from, to)).thenReturn(List.of());
+		when(releaseRepository.countByDeployedAtBetweenAndStatusIn(
+				from,
+				to,
+				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
+		)).thenReturn(0L);
 
 		DoraDashboardResponse response = service.calculate(from, to);
 
@@ -42,6 +49,7 @@ class DoraDashboardServiceTest {
 		assertThat(response.to()).isEqualTo(to);
 		assertThat(response.deploymentFrequency()).isEqualTo(12L);
 		assertThat(response.averageLeadTimeMinutes()).isZero();
+		assertThat(response.changeFailureRate()).isEqualByComparingTo(new BigDecimal("0.00"));
 	}
 
 	@Test
@@ -61,11 +69,56 @@ class DoraDashboardServiceTest {
 		when(releaseRepository.countByDeployedAtBetween(from, to)).thenReturn(2L);
 		when(releaseRepository.findByDeployedAtBetweenAndCommitTimeIsNotNull(from, to))
 				.thenReturn(List.of(first, second));
+		when(releaseRepository.countByDeployedAtBetweenAndStatusIn(
+				from,
+				to,
+				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
+		)).thenReturn(0L);
 
 		DoraDashboardResponse response = service.calculate(from, to);
 
 		assertThat(response.deploymentFrequency()).isEqualTo(2L);
 		assertThat(response.averageLeadTimeMinutes()).isEqualTo(135L);
+	}
+
+	@Test
+	void calculateComputesChangeFailureRate() {
+		DoraDashboardService service = new DoraDashboardService(releaseRepository);
+		LocalDateTime from = LocalDateTime.of(2026, 6, 1, 0, 0);
+		LocalDateTime to = LocalDateTime.of(2026, 6, 30, 23, 59);
+
+		when(releaseRepository.countByDeployedAtBetween(from, to)).thenReturn(8L);
+		when(releaseRepository.findByDeployedAtBetweenAndCommitTimeIsNotNull(from, to)).thenReturn(List.of());
+		when(releaseRepository.countByDeployedAtBetweenAndStatusIn(
+				from,
+				to,
+				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
+		)).thenReturn(2L);
+
+		DoraDashboardResponse response = service.calculate(from, to);
+
+		assertThat(response.deploymentFrequency()).isEqualTo(8L);
+		assertThat(response.changeFailureRate()).isEqualByComparingTo(new BigDecimal("25.00"));
+	}
+
+	@Test
+	void calculateReturnsZeroChangeFailureRateWhenNoDeploymentsExist() {
+		DoraDashboardService service = new DoraDashboardService(releaseRepository);
+		LocalDateTime from = LocalDateTime.of(2026, 6, 1, 0, 0);
+		LocalDateTime to = LocalDateTime.of(2026, 6, 30, 23, 59);
+
+		when(releaseRepository.countByDeployedAtBetween(from, to)).thenReturn(0L);
+		when(releaseRepository.findByDeployedAtBetweenAndCommitTimeIsNotNull(from, to)).thenReturn(List.of());
+
+		DoraDashboardResponse response = service.calculate(from, to);
+
+		assertThat(response.deploymentFrequency()).isZero();
+		assertThat(response.changeFailureRate()).isEqualByComparingTo(new BigDecimal("0.00"));
+		verify(releaseRepository, never()).countByDeployedAtBetweenAndStatusIn(
+				from,
+				to,
+				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
+		);
 	}
 
 	@Test
@@ -80,6 +133,11 @@ class DoraDashboardServiceTest {
 				.isEqualTo(HttpStatus.BAD_REQUEST);
 		verify(releaseRepository, never()).countByDeployedAtBetween(from, to);
 		verify(releaseRepository, never()).findByDeployedAtBetweenAndCommitTimeIsNotNull(from, to);
+		verify(releaseRepository, never()).countByDeployedAtBetweenAndStatusIn(
+				from,
+				to,
+				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
+		);
 	}
 
 	private Release release(LocalDateTime commitTime, LocalDateTime deployedAt) {
