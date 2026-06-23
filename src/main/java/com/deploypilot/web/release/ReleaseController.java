@@ -3,6 +3,9 @@ package com.deploypilot.web.release;
 import com.deploypilot.domain.release.ReleaseService;
 import com.deploypilot.domain.release.dto.ReleaseCreateRequest;
 import com.deploypilot.domain.release.dto.ReleaseResponse;
+import com.deploypilot.domain.rollback.RollbackService;
+import com.deploypilot.domain.rollback.dto.RollbackRequest;
+import com.deploypilot.domain.rollback.dto.RollbackResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -19,9 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReleaseController {
 
 	private final ReleaseService releaseService;
+	private final RollbackService rollbackService;
 
-	public ReleaseController(ReleaseService releaseService) {
+	public ReleaseController(ReleaseService releaseService, RollbackService rollbackService) {
 		this.releaseService = releaseService;
+		this.rollbackService = rollbackService;
 	}
 
 	@GetMapping
@@ -51,7 +56,12 @@ public class ReleaseController {
 	}
 
 	@PostMapping("/{releaseId}/rollback")
-	public ReleaseResponse rollback(@PathVariable Long releaseId) {
-		return releaseService.rollback(releaseId);
+	public RollbackResponse rollback(@PathVariable Long releaseId, @Valid @RequestBody RollbackRequest request) {
+		return rollbackService.rollback(releaseId, request);
+	}
+
+	@GetMapping("/{releaseId}/rollback-records")
+	public List<RollbackResponse> findRollbackRecords(@PathVariable Long releaseId) {
+		return rollbackService.findByReleaseId(releaseId);
 	}
 }

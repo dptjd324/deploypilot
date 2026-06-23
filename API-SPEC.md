@@ -61,6 +61,7 @@ GET /api/releases/{releaseId}
 POST /api/releases/{releaseId}/approve
 POST /api/releases/{releaseId}/deploy
 POST /api/releases/{releaseId}/rollback
+GET /api/releases/{releaseId}/rollback-records
 
 Create Request
 {
@@ -92,6 +93,27 @@ Response
   "stableAt": null,
   "failedAt": null,
   "rolledBackAt": null
+}
+
+Rollback Request
+{
+  "targetVersion": "v0.9.0",
+  "reason": "High error rate after deploy",
+  "createdBy": 1,
+  "ipAddress": "127.0.0.1"
+}
+
+Rollback Response
+{
+  "id": 1,
+  "releaseId": 1,
+  "targetVersion": "v0.9.0",
+  "reason": "High error rate after deploy",
+  "createdBy": 1,
+  "createdByEmail": "admin@example.com",
+  "createdByName": "Admin",
+  "releaseStatus": "ROLLED_BACK",
+  "createdAt": "2026-06-23T10:00:00"
 }
 
 GitHub Actions Integration

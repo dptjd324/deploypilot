@@ -284,6 +284,8 @@ Metric evaluation rule:
 - created_by
 - created_at
 
+created_by references users.id.
+
 ### audit_log
 
 - id
@@ -294,3 +296,11 @@ Metric evaluation rule:
 - message
 - ip_address
 - created_at
+
+Audit action values:
+
+- ROLLBACK_CREATED
+
+Audit target type values:
+
+- RELEASE

@@ -78,10 +78,10 @@
 
 ## Phase 11 - Rollback
 
-- [ ] Add RollbackRecord
-- [ ] Add rollback record API
-- [ ] Update release status to ROLLED_BACK
-- [ ] Add audit log
+- [x] Add RollbackRecord
+- [x] Add rollback record API
+- [x] Update release status to ROLLED_BACK
+- [x] Add audit log
 
 ## Phase 12 - DORA Dashboard
 
