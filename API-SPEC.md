@@ -166,6 +166,27 @@ POST /api/releases/{releaseId}/quality-gate/run
 GET /api/releases/{releaseId}/quality-gate
 GET /api/releases/{releaseId}/quality-checks
 
+Quality Gate Response
+{
+  "id": 1,
+  "releaseId": 1,
+  "result": "PASS",
+  "reason": "All quality checks passed",
+  "checkedAt": "2026-06-24T10:00:00"
+}
+
+Quality Check Response
+{
+  "id": 1,
+  "releaseId": 1,
+  "checkType": "BUILD",
+  "status": "PASS",
+  "severity": "INFO",
+  "message": "Build passed",
+  "detailJson": null,
+  "checkedAt": "2026-06-24T10:00:00"
+}
+
 
 Health Check
 POST /api/releases/{releaseId}/health-check/run
