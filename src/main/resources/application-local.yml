@@ -20,5 +20,7 @@ server:
   port: 8080
 
 deploypilot:
+  security:
+    permit-all: true
   webhook:
     secret: local-secret
