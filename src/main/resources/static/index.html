@@ -7,15 +7,18 @@
 	<style>
 		:root {
 			color-scheme: light;
-			--bg: #f5f7fb;
-			--panel: #ffffff;
-			--line: #d8dee9;
+			--bg: #f4f6f8;
+			--surface: #ffffff;
+			--surface-alt: #eef2f6;
+			--line: #d6dde6;
 			--text: #172033;
-			--muted: #657084;
+			--muted: #697386;
 			--accent: #0f766e;
-			--accent-dark: #115e59;
+			--accent-strong: #115e59;
 			--danger: #b42318;
-			--shadow: 0 8px 24px rgba(23, 32, 51, 0.08);
+			--warn: #9a6700;
+			--ok: #0f7a3b;
+			--shadow: 0 8px 22px rgba(23, 32, 51, 0.07);
 		}
 
 		* {
@@ -31,180 +34,411 @@
 		}
 
 		header {
-			background: var(--panel);
+			position: sticky;
+			top: 0;
+			z-index: 10;
+			background: var(--surface);
 			border-bottom: 1px solid var(--line);
 		}
 
 		.header-inner,
 		main {
-			width: min(1120px, calc(100% - 32px));
+			width: min(1240px, calc(100% - 32px));
 			margin: 0 auto;
 		}
 
 		.header-inner {
-			display: flex;
+			display: grid;
+			grid-template-columns: minmax(220px, auto) 1fr;
+			gap: 18px;
 			align-items: center;
-			justify-content: space-between;
-			min-height: 72px;
-			gap: 20px;
+			min-height: 76px;
 		}
 
-		.brand {
-			display: flex;
-			flex-direction: column;
-			gap: 4px;
+		h1,
+		h2,
+		h3,
+		p {
+			margin-top: 0;
 		}
 
 		h1 {
-			margin: 0;
+			margin-bottom: 4px;
 			font-size: 24px;
-			font-weight: 700;
+		}
+
+		h2 {
+			margin-bottom: 14px;
+			font-size: 20px;
+		}
+
+		h3 {
+			margin-bottom: 12px;
+			font-size: 16px;
 		}
 
 		.subtitle {
-			margin: 0;
+			margin-bottom: 0;
 			color: var(--muted);
-			font-size: 14px;
+			font-size: 13px;
+		}
+
+		.nav {
+			display: flex;
+			justify-content: flex-end;
+			gap: 6px;
+			flex-wrap: wrap;
+		}
+
+		.nav button,
+		.secondary-button,
+		.icon-button {
+			border: 1px solid var(--line);
+			background: var(--surface);
+			color: var(--text);
+		}
+
+		.nav button {
+			min-height: 36px;
+			padding: 0 10px;
+		}
+
+		.nav button.active {
+			border-color: var(--accent);
+			background: var(--accent);
+			color: #ffffff;
 		}
 
 		main {
-			padding: 28px 0 44px;
+			padding: 22px 0 42px;
 		}
 
-		.toolbar {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(220px, 1fr)) auto;
-			align-items: end;
-			gap: 12px;
-			margin-bottom: 20px;
+		.view {
+			display: none;
 		}
 
-		label {
-			display: flex;
-			flex-direction: column;
-			gap: 7px;
-			color: var(--muted);
-			font-size: 13px;
-			font-weight: 700;
+		.view.active {
+			display: block;
 		}
 
-		input {
-			width: 100%;
-			min-height: 42px;
-			border: 1px solid var(--line);
-			border-radius: 6px;
-			padding: 8px 10px;
-			color: var(--text);
-			background: var(--panel);
-			font: inherit;
-		}
-
-		button {
-			min-height: 42px;
-			border: 0;
-			border-radius: 6px;
-			padding: 0 18px;
-			background: var(--accent);
-			color: #ffffff;
-			font: inherit;
-			font-weight: 700;
-			cursor: pointer;
-		}
-
-		button:hover {
-			background: var(--accent-dark);
-		}
-
-		button:disabled {
-			cursor: wait;
-			opacity: 0.7;
-		}
-
-		.status {
-			min-height: 22px;
-			margin: 0 0 16px;
-			color: var(--muted);
-			font-size: 14px;
-		}
-
-		.status.error {
-			color: var(--danger);
-			font-weight: 700;
-		}
-
-		.metric-grid {
+		.stage-strip {
 			display: grid;
 			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 10px;
+			margin-bottom: 18px;
+		}
+
+		.stage {
+			padding: 12px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: var(--surface);
+			box-shadow: var(--shadow);
+		}
+
+		.stage strong {
+			display: block;
+			margin-bottom: 4px;
+			font-size: 13px;
+		}
+
+		.stage span {
+			color: var(--muted);
+			font-size: 12px;
+		}
+
+		.grid-2,
+		.grid-3,
+		.grid-4 {
+			display: grid;
 			gap: 14px;
 		}
 
+		.grid-2 {
+			grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.4fr);
+		}
+
+		.grid-3 {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.grid-4 {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+
+		.panel,
 		.metric {
-			min-height: 148px;
-			padding: 18px;
-			background: var(--panel);
+			background: var(--surface);
 			border: 1px solid var(--line);
 			border-radius: 8px;
 			box-shadow: var(--shadow);
+		}
+
+		.panel {
+			padding: 16px;
+		}
+
+		.metric {
+			min-height: 132px;
+			padding: 16px;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
 		}
 
 		.metric-title {
-			margin: 0;
+			margin-bottom: 10px;
 			color: var(--muted);
 			font-size: 13px;
 			font-weight: 700;
 		}
 
 		.metric-value {
-			margin: 16px 0 0;
-			font-size: 32px;
+			margin-bottom: 0;
+			font-size: 30px;
 			font-weight: 800;
-			line-height: 1.05;
 			overflow-wrap: anywhere;
 		}
 
 		.metric-unit {
 			margin: 8px 0 0;
 			color: var(--muted);
-			font-size: 13px;
+			font-size: 12px;
 		}
 
-		.detail {
-			margin-top: 18px;
-			background: var(--panel);
-			border: 1px solid var(--line);
-			border-radius: 8px;
-			padding: 16px 18px;
+		form {
+			display: grid;
+			gap: 10px;
+		}
+
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+		}
+
+		label {
+			display: grid;
+			gap: 6px;
 			color: var(--muted);
+			font-size: 12px;
+			font-weight: 700;
+		}
+
+		input,
+		select,
+		textarea {
+			width: 100%;
+			min-height: 38px;
+			border: 1px solid var(--line);
+			border-radius: 6px;
+			padding: 8px 10px;
+			background: #ffffff;
+			color: var(--text);
+			font: inherit;
 			font-size: 14px;
+		}
+
+		textarea {
+			min-height: 108px;
+			resize: vertical;
+		}
+
+		.checkbox-row {
 			display: flex;
-			justify-content: space-between;
-			gap: 12px;
+			gap: 14px;
+			align-items: center;
 			flex-wrap: wrap;
 		}
 
-		@media (max-width: 900px) {
-			.metric-grid {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
+		.checkbox-row label {
+			display: inline-flex;
+			grid-template-columns: auto 1fr;
+			align-items: center;
+			gap: 6px;
+			color: var(--text);
+			font-weight: 500;
+		}
+
+		.checkbox-row input {
+			width: 16px;
+			min-height: 16px;
+		}
+
+		button {
+			min-height: 38px;
+			border: 0;
+			border-radius: 6px;
+			padding: 0 14px;
+			background: var(--accent);
+			color: #ffffff;
+			font: inherit;
+			font-size: 14px;
+			font-weight: 700;
+			cursor: pointer;
+			white-space: nowrap;
+		}
+
+		button:hover {
+			background: var(--accent-strong);
+		}
+
+		button:disabled {
+			cursor: wait;
+			opacity: 0.65;
+		}
+
+		.button-row {
+			display: flex;
+			gap: 8px;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		.secondary-button:hover,
+		.icon-button:hover {
+			background: var(--surface-alt);
+			color: var(--text);
+		}
+
+		.danger-button {
+			background: var(--danger);
+		}
+
+		.danger-button:hover {
+			background: #8f1d15;
+		}
+
+		.table-wrap {
+			overflow-x: auto;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			min-width: 760px;
+			background: #ffffff;
+		}
+
+		th,
+		td {
+			padding: 10px;
+			border-bottom: 1px solid var(--line);
+			text-align: left;
+			font-size: 13px;
+			vertical-align: top;
+		}
+
+		th {
+			color: var(--muted);
+			background: #f8fafc;
+			font-weight: 800;
+		}
+
+		tr:last-child td {
+			border-bottom: 0;
+		}
+
+		.status-line {
+			min-height: 24px;
+			margin: 0 0 14px;
+			color: var(--muted);
+			font-size: 13px;
+		}
+
+		.status-line.error {
+			color: var(--danger);
+			font-weight: 700;
+		}
+
+		.status-line.ok {
+			color: var(--ok);
+			font-weight: 700;
+		}
+
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			min-height: 22px;
+			padding: 0 8px;
+			border-radius: 999px;
+			background: var(--surface-alt);
+			color: var(--text);
+			font-size: 12px;
+			font-weight: 700;
+		}
+
+		.badge.warn {
+			color: var(--warn);
+			background: #fff7dd;
+		}
+
+		.badge.fail {
+			color: var(--danger);
+			background: #ffe8e5;
+		}
+
+		.badge.ok {
+			color: var(--ok);
+			background: #e7f7ed;
+		}
+
+		.muted {
+			color: var(--muted);
+		}
+
+		.json-box {
+			white-space: pre-wrap;
+			word-break: break-word;
+			margin: 0;
+			padding: 12px;
+			border-radius: 8px;
+			background: #111827;
+			color: #d1fae5;
+			font-size: 12px;
+			line-height: 1.5;
+			max-height: 340px;
+			overflow: auto;
+		}
+
+		.notice {
+			padding: 12px;
+			border: 1px dashed var(--line);
+			border-radius: 8px;
+			background: #fbfcfe;
+			color: var(--muted);
+			font-size: 13px;
+			line-height: 1.5;
+		}
+
+		@media (max-width: 1000px) {
+			.header-inner,
+			.grid-2,
+			.grid-3,
+			.grid-4,
+			.stage-strip {
+				grid-template-columns: 1fr;
+			}
+
+			.nav {
+				justify-content: flex-start;
 			}
 		}
 
 		@media (max-width: 680px) {
-			.header-inner {
-				align-items: flex-start;
-				flex-direction: column;
-				justify-content: center;
-				padding: 14px 0;
+			.header-inner,
+			main {
+				width: min(100% - 20px, 1240px);
 			}
 
-			.toolbar {
+			.form-grid {
 				grid-template-columns: 1fr;
 			}
 
-			.metric-grid {
-				grid-template-columns: 1fr;
+			h1 {
+				font-size: 21px;
 			}
 		}
 	</style>
@@ -212,70 +446,371 @@
 <body>
 <header>
 	<div class="header-inner">
-		<div class="brand">
+		<div>
 			<h1>DeployPilot</h1>
-			<p class="subtitle">Release quality and DORA dashboard</p>
+			<p class="subtitle">Release Quality Gate Platform</p>
 		</div>
+		<nav class="nav" aria-label="Primary">
+			<button data-view-button="dashboard" class="active" type="button">Dashboard</button>
+			<button data-view-button="services" type="button">Services</button>
+			<button data-view-button="releases" type="button">Releases</button>
+			<button data-view-button="checks" type="button">Checks</button>
+			<button data-view-button="smoke" type="button">Smoke</button>
+			<button data-view-button="risk" type="button">Risk</button>
+			<button data-view-button="metrics" type="button">Metrics</button>
+			<button data-view-button="rollback" type="button">Rollback</button>
+		</nav>
 	</div>
 </header>
+
 <main>
-	<form class="toolbar" id="dashboardForm">
-		<label>
-			From
-			<input id="fromInput" type="datetime-local" required>
-		</label>
-		<label>
-			To
-			<input id="toInput" type="datetime-local" required>
-		</label>
-		<button id="loadButton" type="submit">조회</button>
-	</form>
-
-	<p class="status" id="statusText">기간을 선택하면 DORA 지표를 조회합니다.</p>
-
-	<section class="metric-grid" aria-label="DORA metrics">
-		<article class="metric">
-			<p class="metric-title">Deployment Frequency</p>
-			<p class="metric-value" id="deploymentFrequency">0</p>
-			<p class="metric-unit">deployments</p>
-		</article>
-		<article class="metric">
-			<p class="metric-title">Lead Time for Changes</p>
-			<p class="metric-value" id="averageLeadTimeMinutes">0</p>
-			<p class="metric-unit">minutes</p>
-		</article>
-		<article class="metric">
-			<p class="metric-title">Change Failure Rate</p>
-			<p class="metric-value" id="changeFailureRate">0.00</p>
-			<p class="metric-unit">percent</p>
-		</article>
-		<article class="metric">
-			<p class="metric-title">Recovery Time</p>
-			<p class="metric-value" id="averageFailedDeploymentRecoveryTimeMinutes">0</p>
-			<p class="metric-unit">minutes</p>
-		</article>
+	<section class="stage-strip" aria-label="UI implementation phases">
+		<div class="stage"><strong>UI Phase 1</strong><span>Dashboard, services, releases</span></div>
+		<div class="stage"><strong>UI Phase 2</strong><span>Verification checks and smoke tests</span></div>
+		<div class="stage"><strong>UI Phase 3</strong><span>Risk checks, metrics, rollback</span></div>
+		<div class="stage"><strong>UI Phase 4</strong><span>Quality gate status and API gaps</span></div>
 	</section>
 
-	<section class="detail" aria-label="Selected period">
-		<span id="periodFrom">From: -</span>
-		<span id="periodTo">To: -</span>
+	<p class="status-line" id="globalStatus">준비되었습니다.</p>
+
+	<section class="view active" id="view-dashboard">
+		<div class="panel">
+			<h2>DORA Dashboard</h2>
+			<form id="dashboardForm">
+				<div class="form-grid">
+					<label>From <input id="doraFrom" type="datetime-local" required></label>
+					<label>To <input id="doraTo" type="datetime-local" required></label>
+				</div>
+				<div class="button-row">
+					<button type="submit">DORA 조회</button>
+					<button class="secondary-button" id="refreshAllButton" type="button">전체 새로고침</button>
+				</div>
+			</form>
+		</div>
+		<div class="grid-4" style="margin-top: 14px;">
+			<article class="metric"><p class="metric-title">Deployment Frequency</p><p class="metric-value" id="metricDeploymentFrequency">0</p><p class="metric-unit">deployments</p></article>
+			<article class="metric"><p class="metric-title">Lead Time for Changes</p><p class="metric-value" id="metricLeadTime">0</p><p class="metric-unit">minutes</p></article>
+			<article class="metric"><p class="metric-title">Change Failure Rate</p><p class="metric-value" id="metricFailureRate">0.00</p><p class="metric-unit">percent</p></article>
+			<article class="metric"><p class="metric-title">Recovery Time</p><p class="metric-value" id="metricRecoveryTime">0</p><p class="metric-unit">minutes</p></article>
+		</div>
+	</section>
+
+	<section class="view" id="view-services">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>Service Catalog</h2>
+				<form id="serviceForm">
+					<input type="hidden" id="serviceId">
+					<label>이름 <input id="serviceName" required maxlength="100" placeholder="order-api"></label>
+					<label>설명 <textarea id="serviceDescription" maxlength="500" placeholder="Order service"></textarea></label>
+					<label>Repository URL <input id="serviceRepositoryUrl" required maxlength="500" placeholder="https://github.com/example/order-api"></label>
+					<div class="form-grid">
+						<label>기본 브랜치 <input id="serviceDefaultBranch" required maxlength="100" value="main"></label>
+						<label>팀 <input id="serviceTeamName" required maxlength="100" placeholder="platform"></label>
+					</div>
+					<div class="form-grid">
+						<label>환경
+							<select id="serviceEnvironment">
+								<option>DEV</option>
+								<option>STAGING</option>
+								<option selected>PRODUCTION</option>
+							</select>
+						</label>
+						<label>상태
+							<select id="serviceStatus">
+								<option selected>ACTIVE</option>
+								<option>INACTIVE</option>
+							</select>
+						</label>
+					</div>
+					<label>Health Check URL <input id="serviceHealthCheckUrl" maxlength="500" placeholder="https://order.example.com/health"></label>
+					<div class="button-row">
+						<button type="submit">저장</button>
+						<button class="secondary-button" id="resetServiceForm" type="button">초기화</button>
+						<button class="secondary-button" id="loadServicesButton" type="button">목록 새로고침</button>
+					</div>
+				</form>
+			</div>
+			<div class="panel">
+				<h2>서비스 목록</h2>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>ID</th><th>이름</th><th>환경</th><th>상태</th><th>팀</th><th>작업</th></tr></thead>
+						<tbody id="servicesTable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="view" id="view-releases">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>Release Management</h2>
+				<form id="releaseForm">
+					<label>서비스
+						<select id="releaseServiceAppId" required></select>
+					</label>
+					<div class="form-grid">
+						<label>버전 <input id="releaseVersion" required maxlength="100" placeholder="v1.0.0"></label>
+						<label>환경
+							<select id="releaseEnvironment">
+								<option>DEV</option>
+								<option>STAGING</option>
+								<option selected>PRODUCTION</option>
+							</select>
+						</label>
+					</div>
+					<div class="form-grid">
+						<label>브랜치 <input id="releaseBranch" required maxlength="100" value="main"></label>
+						<label>커밋 해시 <input id="releaseCommitHash" required maxlength="100" placeholder="abc123"></label>
+					</div>
+					<label>커밋 시각 <input id="releaseCommitTime" type="datetime-local"></label>
+					<div class="button-row">
+						<button type="submit">릴리스 생성</button>
+						<button class="secondary-button" id="loadReleasesButton" type="button">목록 새로고침</button>
+					</div>
+				</form>
+			</div>
+			<div class="panel">
+				<h2>릴리스 목록</h2>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>ID</th><th>서비스</th><th>버전</th><th>상태</th><th>Gate</th><th>작업</th></tr></thead>
+						<tbody id="releasesTable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="view" id="view-checks">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>Health Check</h2>
+				<form id="healthForm">
+					<label>릴리스 <select id="healthReleaseId" required></select></label>
+					<div class="button-row">
+						<button type="submit">Health Check 실행</button>
+						<button class="secondary-button" id="loadHealthResultsButton" type="button">결과 조회</button>
+					</div>
+				</form>
+				<div class="table-wrap" style="margin-top: 14px;">
+					<table>
+						<thead><tr><th>ID</th><th>Status</th><th>HTTP</th><th>Time</th><th>Error</th></tr></thead>
+						<tbody id="healthResultsTable"></tbody>
+					</table>
+				</div>
+			</div>
+			<div class="panel">
+				<h2>Quality Gate</h2>
+				<div class="notice">
+					Quality Gate 엔진과 결과 모델은 구현되어 있지만, 현재 웹 컨트롤러 API는 아직 없습니다. API가 추가되면 이 영역에서 실행 버튼과 결과 목록을 연결하면 됩니다.
+				</div>
+				<pre class="json-box" id="releaseDetailBox">릴리스를 선택하면 상태와 gateStatus를 확인할 수 있습니다.</pre>
+			</div>
+		</div>
+	</section>
+
+	<section class="view" id="view-smoke">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>Smoke Test 설정</h2>
+				<form id="smokeForm">
+					<input type="hidden" id="smokeTestId">
+					<label>서비스 <select id="smokeServiceId" required></select></label>
+					<label>이름 <input id="smokeName" required maxlength="100" placeholder="Root endpoint"></label>
+					<div class="form-grid">
+						<label>Method
+							<select id="smokeMethod">
+								<option>GET</option>
+								<option>POST</option>
+								<option>PUT</option>
+								<option>PATCH</option>
+								<option>DELETE</option>
+							</select>
+						</label>
+						<label>Path <input id="smokePath" required maxlength="500" value="/"></label>
+					</div>
+					<div class="form-grid">
+						<label>Expected Status <input id="smokeExpectedStatus" type="number" min="100" max="599" value="200"></label>
+						<label>Max Response Time(ms) <input id="smokeMaxResponseTimeMs" type="number" min="1" value="500"></label>
+					</div>
+					<div class="checkbox-row">
+						<label><input id="smokeRequired" type="checkbox" checked> Required</label>
+						<label><input id="smokeEnabled" type="checkbox" checked> Enabled</label>
+					</div>
+					<div class="button-row">
+						<button type="submit">저장</button>
+						<button class="secondary-button" id="resetSmokeForm" type="button">초기화</button>
+						<button class="secondary-button" id="loadSmokeTestsButton" type="button">목록 조회</button>
+					</div>
+				</form>
+			</div>
+			<div class="panel">
+				<h2>Smoke Test 실행</h2>
+				<form id="smokeRunForm">
+					<label>릴리스 <select id="smokeReleaseId" required></select></label>
+					<div class="button-row">
+						<button type="submit">Smoke Test 실행</button>
+						<button class="secondary-button" id="loadSmokeResultsButton" type="button">결과 조회</button>
+					</div>
+				</form>
+				<div class="table-wrap" style="margin-top: 14px;">
+					<table>
+						<thead><tr><th>ID</th><th>테스트</th><th>Status</th><th>HTTP</th><th>Time</th><th>Error</th></tr></thead>
+						<tbody id="smokeResultsTable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="panel" style="margin-top: 14px;">
+			<h2>Smoke Test 목록</h2>
+			<div class="table-wrap">
+				<table>
+					<thead><tr><th>ID</th><th>서비스</th><th>이름</th><th>Method</th><th>Path</th><th>Enabled</th><th>작업</th></tr></thead>
+					<tbody id="smokeTestsTable"></tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+
+	<section class="view" id="view-risk">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>Risk Check</h2>
+				<form id="riskForm">
+					<label>릴리스 <select id="riskReleaseId" required></select></label>
+					<label>검사 유형
+						<select id="riskType">
+							<option value="db-migration">DB Migration</option>
+							<option value="security-config">Security Config</option>
+						</select>
+					</label>
+					<label>대상 텍스트 <textarea id="riskTargetText" required placeholder="ALTER TABLE orders DROP COLUMN legacy_code;"></textarea></label>
+					<div class="button-row">
+						<button type="submit">Risk Check 실행</button>
+						<button class="secondary-button" id="loadRiskResultsButton" type="button">결과 조회</button>
+					</div>
+				</form>
+			</div>
+			<div class="panel">
+				<h2>Risk 결과</h2>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Severity</th><th>Message</th></tr></thead>
+						<tbody id="riskResultsTable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="view" id="view-metrics">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>Post Deploy Metrics</h2>
+				<form id="metricForm">
+					<label>릴리스 <select id="metricReleaseId" required></select></label>
+					<div class="form-grid">
+						<label>Total Requests <input id="metricTotalRequests" type="number" min="0" value="1000"></label>
+						<label>5xx Count <input id="metricError5xxCount" type="number" min="0" value="0"></label>
+					</div>
+					<div class="form-grid">
+						<label>Avg Response Time(ms) <input id="metricAvgResponseTimeMs" type="number" min="0" value="120"></label>
+						<label>P95 Response Time(ms) <input id="metricP95ResponseTimeMs" type="number" min="0" value="450"></label>
+					</div>
+					<div class="button-row">
+						<button type="submit">메트릭 저장</button>
+						<button class="secondary-button" id="loadMetricsButton" type="button">목록 조회</button>
+					</div>
+				</form>
+			</div>
+			<div class="panel">
+				<h2>Metric 결과</h2>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>ID</th><th>Total</th><th>5xx</th><th>Error Rate</th><th>Avg</th><th>P95</th></tr></thead>
+						<tbody id="metricsTable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="view" id="view-rollback">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>Rollback</h2>
+				<form id="rollbackForm">
+					<label>릴리스 <select id="rollbackReleaseId" required></select></label>
+					<div class="form-grid">
+						<label>Target Version <input id="rollbackTargetVersion" required maxlength="100" placeholder="v0.9.0"></label>
+						<label>Created By User ID <input id="rollbackCreatedBy" type="number" min="1" value="1"></label>
+					</div>
+					<label>Reason <textarea id="rollbackReason" required maxlength="500" placeholder="High error rate after deploy"></textarea></label>
+					<label>IP Address <input id="rollbackIpAddress" maxlength="100" value="127.0.0.1"></label>
+					<div class="button-row">
+						<button class="danger-button" type="submit">롤백 실행</button>
+						<button class="secondary-button" id="loadRollbackRecordsButton" type="button">기록 조회</button>
+					</div>
+				</form>
+			</div>
+			<div class="panel">
+				<h2>Rollback Records</h2>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>ID</th><th>Release</th><th>Target</th><th>Reason</th><th>By</th><th>Created</th></tr></thead>
+						<tbody id="rollbackRecordsTable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 	</section>
 </main>
-<script>
-	const form = document.getElementById("dashboardForm");
-	const fromInput = document.getElementById("fromInput");
-	const toInput = document.getElementById("toInput");
-	const loadButton = document.getElementById("loadButton");
-	const statusText = document.getElementById("statusText");
 
-	const fields = {
-		deploymentFrequency: document.getElementById("deploymentFrequency"),
-		averageLeadTimeMinutes: document.getElementById("averageLeadTimeMinutes"),
-		changeFailureRate: document.getElementById("changeFailureRate"),
-		averageFailedDeploymentRecoveryTimeMinutes: document.getElementById("averageFailedDeploymentRecoveryTimeMinutes"),
-		periodFrom: document.getElementById("periodFrom"),
-		periodTo: document.getElementById("periodTo")
+<script>
+	const state = {
+		services: [],
+		releases: [],
+		lastJson: null
 	};
+
+	const $ = id => document.getElementById(id);
+
+	function setGlobalStatus(message, kind = "") {
+		const el = $("globalStatus");
+		el.textContent = message;
+		el.className = `status-line ${kind}`.trim();
+	}
+
+	async function api(path, options = {}) {
+		const headers = {"Content-Type": "application/json", ...(options.headers || {})};
+		const response = await fetch(path, {...options, headers});
+		if (response.status === 204) {
+			return null;
+		}
+		const text = await response.text();
+		const body = text ? JSON.parse(text) : null;
+		if (!response.ok) {
+			throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+		}
+		return body;
+	}
+
+	function value(id) {
+		return $(id).value;
+	}
+
+	function numberValue(id) {
+		return Number(value(id));
+	}
+
+	function dateTimeValue(id) {
+		const val = value(id);
+		if (!val) return null;
+		return val.length === 16 ? `${val}:00` : val;
+	}
 
 	function toInputValue(date) {
 		const offset = date.getTimezoneOffset();
@@ -283,63 +818,382 @@
 		return local.toISOString().slice(0, 16);
 	}
 
-	function toApiDateTime(value) {
-		return value.length === 16 ? `${value}:00` : value;
+	function escapeHtml(input) {
+		return String(input ?? "")
+			.replaceAll("&", "&amp;")
+			.replaceAll("<", "&lt;")
+			.replaceAll(">", "&gt;")
+			.replaceAll('"', "&quot;")
+			.replaceAll("'", "&#039;");
 	}
 
-	function setDefaultRange() {
+	function badge(value) {
+		const text = String(value ?? "-");
+		const lower = text.toLowerCase();
+		const cls = lower.includes("fail") || lower.includes("rolled") ? "fail" : lower.includes("warn") ? "warn" : lower.includes("pass") || lower.includes("success") || lower.includes("stable") ? "ok" : "";
+		return `<span class="badge ${cls}">${escapeHtml(text)}</span>`;
+	}
+
+	function renderRows(targetId, rows, emptyText) {
+		$(targetId).innerHTML = rows.length ? rows.join("") : `<tr><td colspan="8" class="muted">${emptyText}</td></tr>`;
+	}
+
+	function syncSelect(id, items, labelFn) {
+		const el = $(id);
+		const current = el.value;
+		el.innerHTML = items.map(item => `<option value="${item.id}">${escapeHtml(labelFn(item))}</option>`).join("");
+		if (items.some(item => String(item.id) === current)) {
+			el.value = current;
+		}
+	}
+
+	function syncAllSelects() {
+		const serviceSelects = ["releaseServiceAppId", "smokeServiceId"];
+		const releaseSelects = ["healthReleaseId", "smokeReleaseId", "riskReleaseId", "metricReleaseId", "rollbackReleaseId"];
+		serviceSelects.forEach(id => syncSelect(id, state.services, service => `${service.id} - ${service.name}`));
+		releaseSelects.forEach(id => syncSelect(id, state.releases, release => `${release.id} - ${release.serviceName} ${release.version}`));
+	}
+
+	async function loadServices() {
+		state.services = await api("/api/services");
+		renderRows("servicesTable", state.services.map(service => `
+			<tr>
+				<td>${service.id}</td>
+				<td>${escapeHtml(service.name)}</td>
+				<td>${badge(service.environment)}</td>
+				<td>${badge(service.status)}</td>
+				<td>${escapeHtml(service.teamName)}</td>
+				<td class="button-row">
+					<button class="icon-button" type="button" onclick="editService(${service.id})">수정</button>
+					<button class="danger-button" type="button" onclick="deleteService(${service.id})">삭제</button>
+				</td>
+			</tr>
+		`), "서비스가 없습니다.");
+		syncAllSelects();
+	}
+
+	async function loadReleases() {
+		state.releases = await api("/api/releases");
+		renderRows("releasesTable", state.releases.map(release => `
+			<tr>
+				<td>${release.id}</td>
+				<td>${escapeHtml(release.serviceName)}</td>
+				<td>${escapeHtml(release.version)}</td>
+				<td>${badge(release.status)}</td>
+				<td>${badge(release.gateStatus)}</td>
+				<td class="button-row">
+					<button class="icon-button" type="button" onclick="showRelease(${release.id})">상세</button>
+					<button class="icon-button" type="button" onclick="transitionRelease(${release.id}, 'approve')">승인</button>
+					<button class="icon-button" type="button" onclick="transitionRelease(${release.id}, 'deploy')">배포</button>
+				</td>
+			</tr>
+		`), "릴리스가 없습니다.");
+		syncAllSelects();
+	}
+
+	async function loadDora() {
+		const from = dateTimeValue("doraFrom");
+		const to = dateTimeValue("doraTo");
+		const data = await api(`/api/dashboard/dora?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+		$("metricDeploymentFrequency").textContent = data.deploymentFrequency ?? 0;
+		$("metricLeadTime").textContent = data.averageLeadTimeMinutes ?? 0;
+		$("metricFailureRate").textContent = Number(data.changeFailureRate ?? 0).toFixed(2);
+		$("metricRecoveryTime").textContent = data.averageFailedDeploymentRecoveryTimeMinutes ?? 0;
+	}
+
+	async function loadInitial() {
+		try {
+			await Promise.all([loadServices(), loadReleases()]);
+			await loadDora();
+			setGlobalStatus("데이터를 불러왔습니다.", "ok");
+		} catch (error) {
+			setGlobalStatus(`초기 조회 실패: ${error.message}`, "error");
+		}
+	}
+
+	function resetServiceForm() {
+		$("serviceId").value = "";
+		$("serviceForm").reset();
+		$("serviceDefaultBranch").value = "main";
+		$("serviceEnvironment").value = "PRODUCTION";
+		$("serviceStatus").value = "ACTIVE";
+	}
+
+	function editService(id) {
+		const service = state.services.find(item => item.id === id);
+		if (!service) return;
+		$("serviceId").value = service.id;
+		$("serviceName").value = service.name ?? "";
+		$("serviceDescription").value = service.description ?? "";
+		$("serviceRepositoryUrl").value = service.repositoryUrl ?? "";
+		$("serviceDefaultBranch").value = service.defaultBranch ?? "main";
+		$("serviceTeamName").value = service.teamName ?? "";
+		$("serviceEnvironment").value = service.environment ?? "PRODUCTION";
+		$("serviceStatus").value = service.status ?? "ACTIVE";
+		$("serviceHealthCheckUrl").value = service.healthCheckUrl ?? "";
+		showView("services");
+	}
+
+	async function deleteService(id) {
+		await api(`/api/services/${id}`, {method: "DELETE"});
+		await loadServices();
+		setGlobalStatus("서비스를 삭제했습니다.", "ok");
+	}
+
+	async function showRelease(id) {
+		const release = await api(`/api/releases/${id}`);
+		$("releaseDetailBox").textContent = JSON.stringify(release, null, 2);
+		showView("checks");
+	}
+
+	async function transitionRelease(id, action) {
+		await api(`/api/releases/${id}/${action}`, {method: "POST"});
+		await loadReleases();
+		await loadDora();
+		setGlobalStatus(`릴리스 ${action} 처리 완료`, "ok");
+	}
+
+	async function loadHealthResults() {
+		const releaseId = value("healthReleaseId");
+		const results = await api(`/api/releases/${releaseId}/health-checks`);
+		renderRows("healthResultsTable", results.map(result => `
+			<tr><td>${result.id}</td><td>${badge(result.status)}</td><td>${result.httpStatus ?? "-"}</td><td>${result.responseTimeMs ?? "-"}</td><td>${escapeHtml(result.errorMessage)}</td></tr>
+		`), "Health check 결과가 없습니다.");
+	}
+
+	async function loadSmokeTests() {
+		const serviceId = value("smokeServiceId");
+		const tests = await api(`/api/services/${serviceId}/smoke-tests`);
+		renderRows("smokeTestsTable", tests.map(test => `
+			<tr>
+				<td>${test.id}</td><td>${test.serviceAppId}</td><td>${escapeHtml(test.name)}</td><td>${badge(test.method)}</td><td>${escapeHtml(test.path)}</td><td>${badge(test.enabled)}</td>
+				<td><button class="icon-button" type="button" onclick='editSmoke(${JSON.stringify(test).replaceAll("'", "&#039;")})'>수정</button></td>
+			</tr>
+		`), "Smoke test가 없습니다.");
+	}
+
+	function resetSmokeForm() {
+		$("smokeTestId").value = "";
+		$("smokeForm").reset();
+		$("smokeMethod").value = "GET";
+		$("smokePath").value = "/";
+		$("smokeExpectedStatus").value = "200";
+		$("smokeMaxResponseTimeMs").value = "500";
+		$("smokeRequired").checked = true;
+		$("smokeEnabled").checked = true;
+		syncAllSelects();
+	}
+
+	function editSmoke(test) {
+		$("smokeTestId").value = test.id;
+		$("smokeServiceId").value = test.serviceAppId;
+		$("smokeName").value = test.name ?? "";
+		$("smokeMethod").value = test.method ?? "GET";
+		$("smokePath").value = test.path ?? "/";
+		$("smokeExpectedStatus").value = test.expectedStatus ?? 200;
+		$("smokeMaxResponseTimeMs").value = test.maxResponseTimeMs ?? 500;
+		$("smokeRequired").checked = Boolean(test.required);
+		$("smokeEnabled").checked = Boolean(test.enabled);
+	}
+
+	async function loadSmokeResults() {
+		const releaseId = value("smokeReleaseId");
+		const results = await api(`/api/releases/${releaseId}/smoke-test-results`);
+		renderRows("smokeResultsTable", results.map(result => `
+			<tr><td>${result.id}</td><td>${escapeHtml(result.smokeTestName)}</td><td>${badge(result.status)}</td><td>${result.actualStatus ?? "-"}</td><td>${result.responseTimeMs ?? "-"}</td><td>${escapeHtml(result.errorMessage)}</td></tr>
+		`), "Smoke test 결과가 없습니다.");
+	}
+
+	async function loadRiskResults() {
+		const releaseId = value("riskReleaseId");
+		const results = await api(`/api/releases/${releaseId}/risk-checks`);
+		renderRows("riskResultsTable", results.map(result => `
+			<tr><td>${result.id}</td><td>${badge(result.riskType)}</td><td>${badge(result.status)}</td><td>${badge(result.severity)}</td><td>${escapeHtml(result.message)}</td></tr>
+		`), "Risk check 결과가 없습니다.");
+	}
+
+	async function loadMetrics() {
+		const releaseId = value("metricReleaseId");
+		const metrics = await api(`/api/releases/${releaseId}/metrics`);
+		renderRows("metricsTable", metrics.map(metric => `
+			<tr><td>${metric.id}</td><td>${metric.totalRequests}</td><td>${metric.error5xxCount}</td><td>${metric.errorRate}</td><td>${metric.avgResponseTimeMs}</td><td>${metric.p95ResponseTimeMs}</td></tr>
+		`), "메트릭이 없습니다.");
+	}
+
+	async function loadRollbackRecords() {
+		const releaseId = value("rollbackReleaseId");
+		const records = await api(`/api/releases/${releaseId}/rollback-records`);
+		renderRows("rollbackRecordsTable", records.map(record => `
+			<tr><td>${record.id}</td><td>${record.releaseId}</td><td>${escapeHtml(record.targetVersion)}</td><td>${escapeHtml(record.reason)}</td><td>${escapeHtml(record.createdByEmail)}</td><td>${escapeHtml(record.createdAt)}</td></tr>
+		`), "롤백 기록이 없습니다.");
+	}
+
+	function showView(name) {
+		document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
+		document.querySelectorAll("[data-view-button]").forEach(button => button.classList.remove("active"));
+		$(`view-${name}`).classList.add("active");
+		document.querySelector(`[data-view-button="${name}"]`).classList.add("active");
+	}
+
+	function bindEvents() {
+		document.querySelectorAll("[data-view-button]").forEach(button => {
+			button.addEventListener("click", () => showView(button.dataset.viewButton));
+		});
+
+		$("refreshAllButton").addEventListener("click", loadInitial);
+		$("loadServicesButton").addEventListener("click", loadServices);
+		$("loadReleasesButton").addEventListener("click", loadReleases);
+		$("resetServiceForm").addEventListener("click", resetServiceForm);
+		$("resetSmokeForm").addEventListener("click", resetSmokeForm);
+		$("loadHealthResultsButton").addEventListener("click", loadHealthResults);
+		$("loadSmokeTestsButton").addEventListener("click", loadSmokeTests);
+		$("loadSmokeResultsButton").addEventListener("click", loadSmokeResults);
+		$("loadRiskResultsButton").addEventListener("click", loadRiskResults);
+		$("loadMetricsButton").addEventListener("click", loadMetrics);
+		$("loadRollbackRecordsButton").addEventListener("click", loadRollbackRecords);
+
+		$("dashboardForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			await loadDora();
+			setGlobalStatus("DORA 지표를 조회했습니다.", "ok");
+		});
+
+		$("serviceForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			const id = value("serviceId");
+			const payload = {
+				name: value("serviceName"),
+				description: value("serviceDescription"),
+				repositoryUrl: value("serviceRepositoryUrl"),
+				defaultBranch: value("serviceDefaultBranch"),
+				teamName: value("serviceTeamName"),
+				environment: value("serviceEnvironment"),
+				healthCheckUrl: value("serviceHealthCheckUrl")
+			};
+			if (id) {
+				payload.status = value("serviceStatus");
+				await api(`/api/services/${id}`, {method: "PUT", body: JSON.stringify(payload)});
+			} else {
+				await api("/api/services", {method: "POST", body: JSON.stringify(payload)});
+			}
+			resetServiceForm();
+			await loadServices();
+			setGlobalStatus("서비스를 저장했습니다.", "ok");
+		});
+
+		$("releaseForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			await api("/api/releases", {
+				method: "POST",
+				body: JSON.stringify({
+					serviceAppId: numberValue("releaseServiceAppId"),
+					version: value("releaseVersion"),
+					environment: value("releaseEnvironment"),
+					branch: value("releaseBranch"),
+					commitHash: value("releaseCommitHash"),
+					commitTime: dateTimeValue("releaseCommitTime")
+				})
+			});
+			$("releaseForm").reset();
+			$("releaseBranch").value = "main";
+			await loadReleases();
+			setGlobalStatus("릴리스를 생성했습니다.", "ok");
+		});
+
+		$("healthForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			await api(`/api/releases/${value("healthReleaseId")}/health-check/run`, {method: "POST"});
+			await loadHealthResults();
+			setGlobalStatus("Health check를 실행했습니다.", "ok");
+		});
+
+		$("smokeForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			const serviceId = value("smokeServiceId");
+			const smokeId = value("smokeTestId");
+			const payload = {
+				name: value("smokeName"),
+				method: value("smokeMethod"),
+				path: value("smokePath"),
+				expectedStatus: numberValue("smokeExpectedStatus"),
+				maxResponseTimeMs: numberValue("smokeMaxResponseTimeMs"),
+				required: $("smokeRequired").checked,
+				enabled: $("smokeEnabled").checked
+			};
+			const path = smokeId ? `/api/services/${serviceId}/smoke-tests/${smokeId}` : `/api/services/${serviceId}/smoke-tests`;
+			await api(path, {method: smokeId ? "PUT" : "POST", body: JSON.stringify(payload)});
+			resetSmokeForm();
+			await loadSmokeTests();
+			setGlobalStatus("Smoke test 설정을 저장했습니다.", "ok");
+		});
+
+		$("smokeRunForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			await api(`/api/releases/${value("smokeReleaseId")}/smoke-tests/run`, {method: "POST"});
+			await loadSmokeResults();
+			setGlobalStatus("Smoke test를 실행했습니다.", "ok");
+		});
+
+		$("riskForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			await api(`/api/releases/${value("riskReleaseId")}/risk-check/${value("riskType")}`, {
+				method: "POST",
+				body: JSON.stringify({targetText: value("riskTargetText")})
+			});
+			await loadRiskResults();
+			setGlobalStatus("Risk check를 실행했습니다.", "ok");
+		});
+
+		$("metricForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			await api(`/api/releases/${value("metricReleaseId")}/metrics`, {
+				method: "POST",
+				body: JSON.stringify({
+					totalRequests: numberValue("metricTotalRequests"),
+					error5xxCount: numberValue("metricError5xxCount"),
+					avgResponseTimeMs: numberValue("metricAvgResponseTimeMs"),
+					p95ResponseTimeMs: numberValue("metricP95ResponseTimeMs")
+				})
+			});
+			await loadMetrics();
+			await loadDora();
+			setGlobalStatus("메트릭을 저장했습니다.", "ok");
+		});
+
+		$("rollbackForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			await api(`/api/releases/${value("rollbackReleaseId")}/rollback`, {
+				method: "POST",
+				body: JSON.stringify({
+					targetVersion: value("rollbackTargetVersion"),
+					reason: value("rollbackReason"),
+					createdBy: numberValue("rollbackCreatedBy"),
+					ipAddress: value("rollbackIpAddress")
+				})
+			});
+			await Promise.all([loadRollbackRecords(), loadReleases(), loadDora()]);
+			setGlobalStatus("롤백을 실행했습니다.", "ok");
+		});
+	}
+
+	function setDefaultDates() {
 		const to = new Date();
 		const from = new Date(to);
 		from.setDate(from.getDate() - 30);
 		from.setHours(0, 0, 0, 0);
 		to.setSeconds(0, 0);
-		fromInput.value = toInputValue(from);
-		toInput.value = toInputValue(to);
+		$("doraFrom").value = toInputValue(from);
+		$("doraTo").value = toInputValue(to);
+		$("releaseCommitTime").value = toInputValue(to);
 	}
 
-	function setStatus(message, error = false) {
-		statusText.textContent = message;
-		statusText.classList.toggle("error", error);
-	}
-
-	function render(data) {
-		fields.deploymentFrequency.textContent = data.deploymentFrequency ?? 0;
-		fields.averageLeadTimeMinutes.textContent = data.averageLeadTimeMinutes ?? 0;
-		fields.changeFailureRate.textContent = Number(data.changeFailureRate ?? 0).toFixed(2);
-		fields.averageFailedDeploymentRecoveryTimeMinutes.textContent =
-			data.averageFailedDeploymentRecoveryTimeMinutes ?? 0;
-		fields.periodFrom.textContent = `From: ${data.from ?? "-"}`;
-		fields.periodTo.textContent = `To: ${data.to ?? "-"}`;
-	}
-
-	async function loadDashboard() {
-		const from = toApiDateTime(fromInput.value);
-		const to = toApiDateTime(toInput.value);
-		loadButton.disabled = true;
-		setStatus("조회 중입니다.");
-
-		try {
-			const response = await fetch(`/api/dashboard/dora?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
-			if (!response.ok) {
-				throw new Error(`HTTP ${response.status}`);
-			}
-			const data = await response.json();
-			render(data);
-			setStatus("DORA 지표를 불러왔습니다.");
-		} catch (error) {
-			setStatus(`조회 실패: ${error.message}`, true);
-		} finally {
-			loadButton.disabled = false;
-		}
-	}
-
-	form.addEventListener("submit", event => {
-		event.preventDefault();
-		loadDashboard();
+	window.addEventListener("error", event => {
+		setGlobalStatus(`화면 오류: ${event.message}`, "error");
 	});
 
-	setDefaultRange();
-	loadDashboard();
+	bindEvents();
+	setDefaultDates();
+	loadInitial();
 </script>
 </body>
 </html>
