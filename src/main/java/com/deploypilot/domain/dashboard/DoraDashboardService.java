@@ -32,7 +32,15 @@ public class DoraDashboardService {
 		long deploymentFrequency = releaseRepository.countByDeployedAtBetween(from, to);
 		long averageLeadTimeMinutes = calculateAverageLeadTimeMinutes(from, to);
 		BigDecimal changeFailureRate = calculateChangeFailureRate(from, to, deploymentFrequency);
-		return new DoraDashboardResponse(from, to, deploymentFrequency, averageLeadTimeMinutes, changeFailureRate);
+		long averageFailedDeploymentRecoveryTimeMinutes = calculateAverageFailedDeploymentRecoveryTimeMinutes(from, to);
+		return new DoraDashboardResponse(
+				from,
+				to,
+				deploymentFrequency,
+				averageLeadTimeMinutes,
+				changeFailureRate,
+				averageFailedDeploymentRecoveryTimeMinutes
+		);
 	}
 
 	private long calculateAverageLeadTimeMinutes(LocalDateTime from, LocalDateTime to) {
@@ -61,5 +69,29 @@ public class DoraDashboardService {
 		return BigDecimal.valueOf(failedDeployments)
 				.multiply(BigDecimal.valueOf(100))
 				.divide(BigDecimal.valueOf(deploymentFrequency), 2, RoundingMode.HALF_UP);
+	}
+
+	private long calculateAverageFailedDeploymentRecoveryTimeMinutes(LocalDateTime from, LocalDateTime to) {
+		List<Release> recoveredFailures = releaseRepository.findRecoveredFailedDeployments(from, to);
+		if (recoveredFailures.isEmpty()) {
+			return 0;
+		}
+
+		return Math.round(recoveredFailures.stream()
+				.mapToLong(release -> Duration.between(release.getFailedAt(), recoveryCompletedAt(release)).toMinutes())
+				.average()
+				.orElse(0));
+	}
+
+	private LocalDateTime recoveryCompletedAt(Release release) {
+		LocalDateTime rolledBackAt = release.getRolledBackAt();
+		LocalDateTime stableAt = release.getStableAt();
+		if (rolledBackAt == null) {
+			return stableAt;
+		}
+		if (stableAt == null) {
+			return rolledBackAt;
+		}
+		return rolledBackAt.isBefore(stableAt) ? rolledBackAt : stableAt;
 	}
 }

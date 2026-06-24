@@ -8,6 +8,7 @@ public record DoraDashboardResponse(
 		LocalDateTime to,
 		long deploymentFrequency,
 		long averageLeadTimeMinutes,
-		BigDecimal changeFailureRate
+		BigDecimal changeFailureRate,
+		long averageFailedDeploymentRecoveryTimeMinutes
 ) {
 }

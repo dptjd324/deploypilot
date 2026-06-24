@@ -88,4 +88,4 @@
 - [x] Add deployment frequency calculation
 - [x] Add lead time for changes calculation
 - [x] Add change failure rate calculation
-- [ ] Add failed deployment recovery time calculation
+- [x] Add failed deployment recovery time calculation

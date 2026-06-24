@@ -42,6 +42,7 @@ class DoraDashboardServiceTest {
 				to,
 				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
 		)).thenReturn(0L);
+		when(releaseRepository.findRecoveredFailedDeployments(from, to)).thenReturn(List.of());
 
 		DoraDashboardResponse response = service.calculate(from, to);
 
@@ -50,6 +51,7 @@ class DoraDashboardServiceTest {
 		assertThat(response.deploymentFrequency()).isEqualTo(12L);
 		assertThat(response.averageLeadTimeMinutes()).isZero();
 		assertThat(response.changeFailureRate()).isEqualByComparingTo(new BigDecimal("0.00"));
+		assertThat(response.averageFailedDeploymentRecoveryTimeMinutes()).isZero();
 	}
 
 	@Test
@@ -74,6 +76,7 @@ class DoraDashboardServiceTest {
 				to,
 				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
 		)).thenReturn(0L);
+		when(releaseRepository.findRecoveredFailedDeployments(from, to)).thenReturn(List.of());
 
 		DoraDashboardResponse response = service.calculate(from, to);
 
@@ -94,6 +97,7 @@ class DoraDashboardServiceTest {
 				to,
 				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
 		)).thenReturn(2L);
+		when(releaseRepository.findRecoveredFailedDeployments(from, to)).thenReturn(List.of());
 
 		DoraDashboardResponse response = service.calculate(from, to);
 
@@ -109,16 +113,49 @@ class DoraDashboardServiceTest {
 
 		when(releaseRepository.countByDeployedAtBetween(from, to)).thenReturn(0L);
 		when(releaseRepository.findByDeployedAtBetweenAndCommitTimeIsNotNull(from, to)).thenReturn(List.of());
+		when(releaseRepository.findRecoveredFailedDeployments(from, to)).thenReturn(List.of());
 
 		DoraDashboardResponse response = service.calculate(from, to);
 
 		assertThat(response.deploymentFrequency()).isZero();
 		assertThat(response.changeFailureRate()).isEqualByComparingTo(new BigDecimal("0.00"));
+		assertThat(response.averageFailedDeploymentRecoveryTimeMinutes()).isZero();
 		verify(releaseRepository, never()).countByDeployedAtBetweenAndStatusIn(
 				from,
 				to,
 				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
 		);
+	}
+
+	@Test
+	void calculateAveragesFailedDeploymentRecoveryTime() {
+		DoraDashboardService service = new DoraDashboardService(releaseRepository);
+		LocalDateTime from = LocalDateTime.of(2026, 6, 1, 0, 0);
+		LocalDateTime to = LocalDateTime.of(2026, 6, 30, 23, 59);
+		Release rolledBack = recoveredFailure(
+				LocalDateTime.of(2026, 6, 12, 10, 0),
+				LocalDateTime.of(2026, 6, 12, 11, 0),
+				null
+		);
+		Release stabilized = recoveredFailure(
+				LocalDateTime.of(2026, 6, 13, 9, 0),
+				null,
+				LocalDateTime.of(2026, 6, 13, 11, 0)
+		);
+
+		when(releaseRepository.countByDeployedAtBetween(from, to)).thenReturn(2L);
+		when(releaseRepository.findByDeployedAtBetweenAndCommitTimeIsNotNull(from, to)).thenReturn(List.of());
+		when(releaseRepository.countByDeployedAtBetweenAndStatusIn(
+				from,
+				to,
+				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
+		)).thenReturn(1L);
+		when(releaseRepository.findRecoveredFailedDeployments(from, to))
+				.thenReturn(List.of(rolledBack, stabilized));
+
+		DoraDashboardResponse response = service.calculate(from, to);
+
+		assertThat(response.averageFailedDeploymentRecoveryTimeMinutes()).isEqualTo(90L);
 	}
 
 	@Test
@@ -138,6 +175,7 @@ class DoraDashboardServiceTest {
 				to,
 				List.of(ReleaseStatus.FAILED, ReleaseStatus.ROLLED_BACK)
 		);
+		verify(releaseRepository, never()).findRecoveredFailedDeployments(from, to);
 	}
 
 	private Release release(LocalDateTime commitTime, LocalDateTime deployedAt) {
@@ -150,6 +188,17 @@ class DoraDashboardServiceTest {
 				commitTime
 		);
 		ReflectionTestUtils.setField(release, "deployedAt", deployedAt);
+		return release;
+	}
+
+	private Release recoveredFailure(LocalDateTime failedAt, LocalDateTime rolledBackAt, LocalDateTime stableAt) {
+		Release release = release(
+				LocalDateTime.of(2026, 6, 10, 10, 0),
+				LocalDateTime.of(2026, 6, 10, 11, 0)
+		);
+		ReflectionTestUtils.setField(release, "failedAt", failedAt);
+		ReflectionTestUtils.setField(release, "rolledBackAt", rolledBackAt);
+		ReflectionTestUtils.setField(release, "stableAt", stableAt);
 		return release;
 	}
 

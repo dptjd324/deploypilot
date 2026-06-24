@@ -289,5 +289,6 @@ DORA Dashboard Response
   "to": "2026-06-30T23:59:59",
   "deploymentFrequency": 12,
   "averageLeadTimeMinutes": 135,
-  "changeFailureRate": 16.67
+  "changeFailureRate": 16.67,
+  "averageFailedDeploymentRecoveryTimeMinutes": 90
 }
