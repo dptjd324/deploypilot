@@ -187,6 +187,40 @@ Quality Check Response
   "checkedAt": "2026-06-24T10:00:00"
 }
 
+Checklist
+GET /api/releases/{releaseId}/checklist-items
+POST /api/releases/{releaseId}/checklist-items
+PUT /api/releases/{releaseId}/checklist-items/{itemId}
+POST /api/releases/{releaseId}/checklist-items/{itemId}/check
+POST /api/releases/{releaseId}/checklist-items/{itemId}/uncheck
+DELETE /api/releases/{releaseId}/checklist-items/{itemId}
+
+Create or Update Request
+{
+  "title": "DB migration reviewed",
+  "description": "Review migration rollback plan",
+  "phase": "PRE_DEPLOY",
+  "required": true
+}
+
+Check Request
+{
+  "checkedBy": "admin@example.com"
+}
+
+Checklist Response
+{
+  "id": 1,
+  "releaseId": 1,
+  "title": "DB migration reviewed",
+  "description": "Review migration rollback plan",
+  "phase": "PRE_DEPLOY",
+  "required": true,
+  "checked": true,
+  "checkedBy": "admin@example.com",
+  "checkedAt": "2026-06-25T10:00:00"
+}
+
 
 Health Check
 POST /api/releases/{releaseId}/health-check/run

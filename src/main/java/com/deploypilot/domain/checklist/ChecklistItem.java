@@ -82,6 +82,19 @@ public class ChecklistItem {
 		this.checkedAt = LocalDateTime.now();
 	}
 
+	public void update(String title, String description, ChecklistPhase phase, boolean required) {
+		this.title = title;
+		this.description = description;
+		this.phase = phase;
+		this.required = required;
+	}
+
+	public void uncheck() {
+		this.checked = false;
+		this.checkedBy = null;
+		this.checkedAt = null;
+	}
+
 	public Long getId() {
 		return id;
 	}
