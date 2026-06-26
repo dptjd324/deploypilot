@@ -7,6 +7,21 @@ POST /api/auth/login
 POST /api/auth/logout
 GET /api/auth/me
 
+Login Request
+{
+  "email": "admin@example.com",
+  "password": "admin-password"
+}
+
+Auth User Response
+{
+  "authenticated": true,
+  "id": 1,
+  "email": "admin@example.com",
+  "name": "DeployPilot Admin",
+  "role": "ADMIN"
+}
+
 
 Service Catalog
 GET /api/services

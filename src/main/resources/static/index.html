@@ -49,7 +49,7 @@
 
 		.header-inner {
 			display: grid;
-			grid-template-columns: minmax(220px, auto) 1fr;
+			grid-template-columns: minmax(220px, auto) 1fr minmax(260px, 320px);
 			gap: 18px;
 			align-items: center;
 			min-height: 76px;
@@ -111,6 +111,36 @@
 			border-color: var(--accent);
 			background: var(--accent);
 			color: #ffffff;
+		}
+
+		.auth-panel {
+			display: grid;
+			gap: 8px;
+			padding: 10px 0;
+		}
+
+		.auth-row {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+			gap: 6px;
+			align-items: center;
+		}
+
+		.auth-row input {
+			min-height: 32px;
+			font-size: 12px;
+		}
+
+		.auth-row button {
+			min-height: 32px;
+			padding: 0 10px;
+			font-size: 12px;
+		}
+
+		.auth-state {
+			color: var(--muted);
+			font-size: 12px;
+			text-align: right;
 		}
 
 		main {
@@ -411,6 +441,10 @@
 			.nav {
 				justify-content: flex-start;
 			}
+
+			.auth-state {
+				text-align: left;
+			}
 		}
 
 		@media (max-width: 680px) {
@@ -446,6 +480,17 @@
 			<button data-view-button="metrics" type="button">메트릭</button>
 			<button data-view-button="rollback" type="button">롤백</button>
 		</nav>
+		<div class="auth-panel">
+			<form id="loginForm" class="auth-row">
+				<input id="loginEmail" type="email" placeholder="admin@example.com" autocomplete="username" required>
+				<input id="loginPassword" type="password" placeholder="비밀번호" autocomplete="current-password" required>
+				<button type="submit">로그인</button>
+			</form>
+			<div class="button-row" style="justify-content: flex-end;">
+				<span class="auth-state" id="authState">인증 상태 확인 중</span>
+				<button class="secondary-button" id="logoutButton" type="button">로그아웃</button>
+			</div>
+		</div>
 	</div>
 </header>
 
@@ -817,7 +862,7 @@
 
 	async function api(path, options = {}) {
 		const headers = {"Content-Type": "application/json", ...(options.headers || {})};
-		const response = await fetch(path, {...options, headers});
+		const response = await fetch(path, {...options, headers, credentials: "same-origin"});
 		if (response.status === 204) return null;
 		const text = await response.text();
 		let body = null;
@@ -893,6 +938,17 @@
 		} catch (error) {
 			setGlobalStatus(error.message, "error");
 		}
+	}
+
+	async function loadAuthState() {
+		const user = await api("/api/auth/me");
+		if (user.authenticated) {
+			$("authState").textContent = `${user.name} (${user.role})`;
+			$("loginEmail").value = user.email ?? "";
+			$("loginPassword").value = "";
+			return;
+		}
+		$("authState").textContent = "로그인하지 않음";
 	}
 
 	async function loadServices() {
@@ -1184,6 +1240,26 @@
 		$("loadMetricsButton").addEventListener("click", () => runAction(loadMetrics));
 		$("loadRollbackRecordsButton").addEventListener("click", () => runAction(loadRollbackRecords));
 		$("resetChecklistForm").addEventListener("click", resetChecklistForm);
+		$("logoutButton").addEventListener("click", () => runAction(async () => {
+			await api("/api/auth/logout", {method: "POST"});
+			await loadAuthState();
+			setGlobalStatus("로그아웃했습니다.", "ok");
+		}));
+
+		$("loginForm").addEventListener("submit", event => runAction(async () => {
+			event.preventDefault();
+			const user = await api("/api/auth/login", {
+				method: "POST",
+				body: JSON.stringify({
+					email: value("loginEmail"),
+					password: value("loginPassword")
+				})
+			});
+			$("authState").textContent = `${user.name} (${user.role})`;
+			$("loginPassword").value = "";
+			await loadInitial();
+			setGlobalStatus("로그인했습니다.", "ok");
+		}));
 
 		$("dashboardForm").addEventListener("submit", event => runAction(async () => {
 			event.preventDefault();
@@ -1353,6 +1429,7 @@
 
 	bindEvents();
 	setDefaultDates();
+	runAction(loadAuthState);
 	runAction(loadInitial);
 </script>
 </body>
