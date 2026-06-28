@@ -4,6 +4,7 @@ import com.deploypilot.domain.cicd.dto.CiRunResponse;
 import com.deploypilot.domain.cicd.dto.GitHubActionsRunRequest;
 import com.deploypilot.domain.release.Release;
 import com.deploypilot.domain.release.ReleaseRepository;
+import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,22 @@ public class CiRunService {
 		);
 
 		return CiRunResponse.from(savedCiRun);
+	}
+
+	@Transactional(readOnly = true)
+	public List<CiRunResponse> findRecentRuns() {
+		return ciRunRepository.findTop50ByOrderByCreatedAtDesc()
+				.stream()
+				.map(CiRunResponse::from)
+				.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public List<CiRunResponse> findByReleaseId(Long releaseId) {
+		return ciRunRepository.findByReleaseIdOrderByCreatedAtDesc(releaseId)
+				.stream()
+				.map(CiRunResponse::from)
+				.toList();
 	}
 
 	private void validateSecret(String token) {

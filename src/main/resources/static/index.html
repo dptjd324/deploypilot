@@ -474,6 +474,7 @@
 			<button data-view-button="dashboard" class="active" type="button">대시보드</button>
 			<button data-view-button="services" type="button">서비스</button>
 			<button data-view-button="releases" type="button">릴리스</button>
+			<button data-view-button="ci" type="button">CI</button>
 			<button data-view-button="checks" type="button">검증</button>
 			<button data-view-button="smoke" type="button">스모크</button>
 			<button data-view-button="risk" type="button">위험 점검</button>
@@ -607,6 +608,31 @@
 					<table>
 						<thead><tr><th>ID</th><th>서비스</th><th>버전</th><th>상태</th><th>게이트</th><th>작업</th></tr></thead>
 						<tbody id="releasesTable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="view" id="view-ci">
+		<div class="grid-2">
+			<div class="panel">
+				<h2>CI 실행 결과</h2>
+				<form id="ciRunForm">
+					<label>릴리스 <select id="ciReleaseId" required></select></label>
+					<div class="button-row">
+						<button type="submit">릴리스별 조회</button>
+						<button class="secondary-button" id="loadRecentCiRunsButton" type="button">최근 50건 조회</button>
+					</div>
+				</form>
+				<pre class="json-box" id="ciRunDetailBox" style="margin-top: 14px;">CI 실행 상세가 여기에 표시됩니다.</pre>
+			</div>
+			<div class="panel">
+				<h2>CI 실행 목록</h2>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>ID</th><th>릴리스</th><th>Provider</th><th>Workflow</th><th>Run</th><th>상태</th><th>테스트</th><th>커버리지</th><th>작업</th></tr></thead>
+						<tbody id="ciRunsTable"></tbody>
 					</table>
 				</div>
 			</div>
@@ -928,7 +954,7 @@
 
 	function syncAllSelects() {
 		["releaseServiceAppId", "smokeServiceId"].forEach(id => syncSelect(id, state.services, service => `${service.id} - ${service.name}`));
-		["gateReleaseId", "healthReleaseId", "checklistReleaseId", "smokeReleaseId", "riskReleaseId", "metricReleaseId", "rollbackReleaseId"]
+		["ciReleaseId", "gateReleaseId", "healthReleaseId", "checklistReleaseId", "smokeReleaseId", "riskReleaseId", "metricReleaseId", "rollbackReleaseId"]
 			.forEach(id => syncSelect(id, state.releases, release => `${release.id} - ${release.serviceName} ${release.version}`));
 	}
 
@@ -996,6 +1022,43 @@
 		$("metricLeadTime").textContent = data.averageLeadTimeMinutes ?? 0;
 		$("metricFailureRate").textContent = Number(data.changeFailureRate ?? 0).toFixed(2);
 		$("metricRecoveryTime").textContent = data.averageFailedDeploymentRecoveryTimeMinutes ?? 0;
+	}
+
+	function renderCiRuns(runs) {
+		renderRows("ciRunsTable", runs.map(run => `
+			<tr>
+				<td>${run.id}</td>
+				<td>${run.releaseId}</td>
+				<td>${badge(run.provider)}</td>
+				<td>${escapeHtml(run.workflowName)}</td>
+				<td>${escapeHtml(run.runId)}</td>
+				<td>${badge(run.status)}</td>
+				<td>${run.passedTests ?? "-"} / ${run.totalTests ?? "-"}</td>
+				<td>${run.coverage ?? "-"}</td>
+				<td class="button-row">
+					<button class="icon-button" type="button" onclick='showCiRunDetail(${JSON.stringify(run).replaceAll("'", "&#039;")})'>상세</button>
+					${run.logUrl ? `<a class="badge" href="${escapeHtml(run.logUrl)}" target="_blank" rel="noreferrer">로그</a>` : ""}
+				</td>
+			</tr>
+		`), "CI 실행 결과가 없습니다.");
+	}
+
+	async function loadRecentCiRuns() {
+		const runs = await api("/api/ci-runs");
+		renderCiRuns(runs);
+		$("ciRunDetailBox").textContent = runs.length ? JSON.stringify(runs[0], null, 2) : "CI 실행 상세가 여기에 표시됩니다.";
+	}
+
+	async function loadCiRunsByRelease() {
+		const releaseId = value("ciReleaseId");
+		const runs = await api(`/api/releases/${releaseId}/ci-runs`);
+		renderCiRuns(runs);
+		$("ciRunDetailBox").textContent = runs.length ? JSON.stringify(runs[0], null, 2) : "선택한 릴리스의 CI 실행 결과가 없습니다.";
+	}
+
+	function showCiRunDetail(run) {
+		$("ciRunDetailBox").textContent = JSON.stringify(run, null, 2);
+		showView("ci");
 	}
 
 	async function loadInitial() {
@@ -1228,6 +1291,7 @@
 		$("refreshAllButton").addEventListener("click", () => runAction(loadInitial));
 		$("loadServicesButton").addEventListener("click", () => runAction(loadServices));
 		$("loadReleasesButton").addEventListener("click", () => runAction(loadReleases));
+		$("loadRecentCiRunsButton").addEventListener("click", () => runAction(loadRecentCiRuns));
 		$("resetServiceForm").addEventListener("click", resetServiceForm);
 		$("resetSmokeForm").addEventListener("click", resetSmokeForm);
 		$("loadGateResultButton").addEventListener("click", () => runAction(loadGateResult));
@@ -1307,6 +1371,12 @@
 			$("releaseBranch").value = "main";
 			await loadReleases();
 			setGlobalStatus("릴리스를 생성했습니다.", "ok");
+		}));
+
+		$("ciRunForm").addEventListener("submit", event => runAction(async () => {
+			event.preventDefault();
+			await loadCiRunsByRelease();
+			setGlobalStatus("릴리스별 CI 실행 결과를 조회했습니다.", "ok");
 		}));
 
 		$("gateForm").addEventListener("submit", event => runAction(async () => {

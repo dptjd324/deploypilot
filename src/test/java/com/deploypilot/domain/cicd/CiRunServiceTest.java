@@ -17,12 +17,14 @@ import com.deploypilot.domain.serviceapp.ServiceApp;
 import com.deploypilot.domain.serviceapp.ServiceAppEnvironment;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
@@ -106,6 +108,32 @@ class CiRunServiceTest {
 				.isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
+	@Test
+	void findRecentRunsReturnsLatestCiRuns() {
+		CiRunService service = new CiRunService(ciRunRepository, releaseRepository, webhookSecretProperties);
+
+		when(ciRunRepository.findTop50ByOrderByCreatedAtDesc()).thenReturn(List.of(ciRun(CiRunStatus.SUCCESS)));
+
+		List<CiRunResponse> responses = service.findRecentRuns();
+
+		assertThat(responses).hasSize(1);
+		assertThat(responses.get(0).provider()).isEqualTo(CiProvider.GITHUB_ACTIONS);
+		assertThat(responses.get(0).status()).isEqualTo(CiRunStatus.SUCCESS);
+	}
+
+	@Test
+	void findByReleaseIdReturnsRunsForRelease() {
+		CiRunService service = new CiRunService(ciRunRepository, releaseRepository, webhookSecretProperties);
+
+		when(ciRunRepository.findByReleaseIdOrderByCreatedAtDesc(1L)).thenReturn(List.of(ciRun(CiRunStatus.FAILURE)));
+
+		List<CiRunResponse> responses = service.findByReleaseId(1L);
+
+		assertThat(responses).hasSize(1);
+		assertThat(responses.get(0).releaseId()).isEqualTo(1L);
+		assertThat(responses.get(0).status()).isEqualTo(CiRunStatus.FAILURE);
+	}
+
 	private GitHubActionsRunRequest request(CiRunStatus status) {
 		return new GitHubActionsRunRequest(
 				"order-api",
@@ -125,8 +153,25 @@ class CiRunServiceTest {
 		);
 	}
 
+	private CiRun ciRun(CiRunStatus status) {
+		return CiRun.create(
+				release(),
+				CiProvider.GITHUB_ACTIONS,
+				"CI",
+				"123",
+				status,
+				120,
+				status == CiRunStatus.SUCCESS ? 120 : 110,
+				status == CiRunStatus.SUCCESS ? 0 : 10,
+				new BigDecimal("78.40"),
+				LocalDateTime.of(2026, 6, 19, 10, 0),
+				LocalDateTime.of(2026, 6, 19, 10, 3, 30),
+				"https://github.com/example/order-api/actions/runs/123"
+		);
+	}
+
 	private Release release() {
-		return Release.create(
+		Release release = Release.create(
 				serviceApp(),
 				"v1.0.0",
 				ServiceAppEnvironment.PRODUCTION,
@@ -134,6 +179,8 @@ class CiRunServiceTest {
 				"abc123",
 				LocalDateTime.of(2026, 6, 19, 9, 50)
 		);
+		ReflectionTestUtils.setField(release, "id", 1L);
+		return release;
 	}
 
 	private ServiceApp serviceApp() {

@@ -133,6 +133,8 @@ Rollback Response
 
 GitHub Actions Integration
 POST /api/integrations/github-actions/runs
+GET /api/ci-runs
+GET /api/releases/{releaseId}/ci-runs
 
 
 Headers
