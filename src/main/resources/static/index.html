@@ -637,6 +637,46 @@
 				</div>
 			</div>
 		</div>
+		<div class="panel" style="margin-top: 14px;">
+			<h2>GitHub Actions Webhook 테스트</h2>
+			<form id="githubWebhookForm">
+				<div class="form-grid">
+					<label>Webhook Token <input id="githubWebhookToken" required value="local-secret"></label>
+					<label>릴리스 <select id="githubWebhookReleaseId" required></select></label>
+				</div>
+				<div class="form-grid">
+					<label>Workflow <input id="githubWorkflowName" required maxlength="200" value="CI"></label>
+					<label>Run ID <input id="githubRunId" maxlength="100" placeholder="123"></label>
+				</div>
+				<div class="form-grid">
+					<label>상태
+						<select id="githubRunStatus">
+							<option>SUCCESS</option>
+							<option>FAILURE</option>
+							<option>IN_PROGRESS</option>
+							<option>CANCELLED</option>
+						</select>
+					</label>
+					<label>커버리지 <input id="githubCoverage" type="number" min="0" step="0.01" value="80.00"></label>
+				</div>
+				<div class="form-grid">
+					<label>전체 테스트 <input id="githubTotalTests" type="number" min="0" value="120"></label>
+					<label>성공 테스트 <input id="githubPassedTests" type="number" min="0" value="120"></label>
+				</div>
+				<div class="form-grid">
+					<label>실패 테스트 <input id="githubFailedTests" type="number" min="0" value="0"></label>
+					<label>로그 URL <input id="githubLogUrl" maxlength="500" placeholder="https://github.com/example/actions/runs/123"></label>
+				</div>
+				<div class="form-grid">
+					<label>시작 시각 <input id="githubStartedAt" type="datetime-local"></label>
+					<label>종료 시각 <input id="githubFinishedAt" type="datetime-local"></label>
+				</div>
+				<div class="button-row">
+					<button type="submit">Webhook 테스트 전송</button>
+					<button class="secondary-button" id="fillGithubWebhookButton" type="button">선택 릴리스 값 채우기</button>
+				</div>
+			</form>
+		</div>
 	</section>
 
 	<section class="view" id="view-checks">
@@ -954,7 +994,7 @@
 
 	function syncAllSelects() {
 		["releaseServiceAppId", "smokeServiceId"].forEach(id => syncSelect(id, state.services, service => `${service.id} - ${service.name}`));
-		["ciReleaseId", "gateReleaseId", "healthReleaseId", "checklistReleaseId", "smokeReleaseId", "riskReleaseId", "metricReleaseId", "rollbackReleaseId"]
+		["ciReleaseId", "githubWebhookReleaseId", "gateReleaseId", "healthReleaseId", "checklistReleaseId", "smokeReleaseId", "riskReleaseId", "metricReleaseId", "rollbackReleaseId"]
 			.forEach(id => syncSelect(id, state.releases, release => `${release.id} - ${release.serviceName} ${release.version}`));
 	}
 
@@ -1059,6 +1099,25 @@
 	function showCiRunDetail(run) {
 		$("ciRunDetailBox").textContent = JSON.stringify(run, null, 2);
 		showView("ci");
+	}
+
+	function selectedGithubWebhookRelease() {
+		const releaseId = Number(value("githubWebhookReleaseId"));
+		return state.releases.find(release => release.id === releaseId);
+	}
+
+	function fillGithubWebhookFromRelease() {
+		const release = selectedGithubWebhookRelease();
+		if (!release) {
+			setGlobalStatus("Webhook 테스트에 사용할 릴리스를 먼저 선택하세요.", "error");
+			return;
+		}
+		const now = new Date();
+		const started = new Date(now.getTime() - 210000);
+		$("githubRunId").value = `${release.id}-${Date.now()}`;
+		$("githubLogUrl").value = `https://github.com/example/${release.serviceName}/actions/runs/${$("githubRunId").value}`;
+		$("githubStartedAt").value = toInputValue(started);
+		$("githubFinishedAt").value = toInputValue(now);
 	}
 
 	async function loadInitial() {
@@ -1292,6 +1351,7 @@
 		$("loadServicesButton").addEventListener("click", () => runAction(loadServices));
 		$("loadReleasesButton").addEventListener("click", () => runAction(loadReleases));
 		$("loadRecentCiRunsButton").addEventListener("click", () => runAction(loadRecentCiRuns));
+		$("fillGithubWebhookButton").addEventListener("click", fillGithubWebhookFromRelease);
 		$("resetServiceForm").addEventListener("click", resetServiceForm);
 		$("resetSmokeForm").addEventListener("click", resetSmokeForm);
 		$("loadGateResultButton").addEventListener("click", () => runAction(loadGateResult));
@@ -1377,6 +1437,37 @@
 			event.preventDefault();
 			await loadCiRunsByRelease();
 			setGlobalStatus("릴리스별 CI 실행 결과를 조회했습니다.", "ok");
+		}));
+
+		$("githubWebhookForm").addEventListener("submit", event => runAction(async () => {
+			event.preventDefault();
+			const release = selectedGithubWebhookRelease();
+			if (!release) {
+				throw new Error("Webhook 테스트에 사용할 릴리스를 먼저 선택하세요.");
+			}
+			const result = await api("/api/integrations/github-actions/runs", {
+				method: "POST",
+				headers: {"X-DeployPilot-Token": value("githubWebhookToken")},
+				body: JSON.stringify({
+					serviceName: release.serviceName,
+					version: release.version,
+					branch: release.branch,
+					commitHash: release.commitHash,
+					workflowName: value("githubWorkflowName"),
+					runId: value("githubRunId"),
+					status: value("githubRunStatus"),
+					totalTests: numberValue("githubTotalTests"),
+					passedTests: numberValue("githubPassedTests"),
+					failedTests: numberValue("githubFailedTests"),
+					coverage: Number(value("githubCoverage")),
+					logUrl: value("githubLogUrl"),
+					startedAt: dateTimeValue("githubStartedAt"),
+					finishedAt: dateTimeValue("githubFinishedAt")
+				})
+			});
+			$("ciRunDetailBox").textContent = JSON.stringify(result, null, 2);
+			await Promise.all([loadRecentCiRuns(), loadReleases(), loadDora()]);
+			setGlobalStatus("GitHub Actions webhook 테스트 요청을 저장했습니다.", "ok");
 		}));
 
 		$("gateForm").addEventListener("submit", event => runAction(async () => {
@@ -1491,6 +1582,8 @@
 		$("doraFrom").value = toInputValue(from);
 		$("doraTo").value = toInputValue(to);
 		$("releaseCommitTime").value = toInputValue(to);
+		$("githubStartedAt").value = toInputValue(new Date(to.getTime() - 210000));
+		$("githubFinishedAt").value = toInputValue(to);
 	}
 
 	window.addEventListener("error", event => {
